@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="limited" default="false" doc="If true, limits joint range [-PI, PI] on all joints." />
+  <arg name="paused" default="true" doc="Starts gazebo in paused mode" />
+  <arg name="gui" default="true" doc="Starts gazebo gui" />
+  <arg name="sim" default="true" />
+  <arg name="debug" default="false" />
+  <arg name="config" default="true" />
+
+  <!-- startup simulated world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" default="worlds/empty.world"/>
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="gui" value="$(arg gui)"/>
+  </include>
+
+  <!-- send robot urdf to param server -->
+  <include file="$(find ur_description)/launch/ur3_upload.launch">
+    <arg name="limited" value="$(arg limited)"/>
+  </include>
+
+  <!-- spawn in gazebo -->
+  <!-- push robot_description to factory and spawn robot in gazebo -->
+  <node name="UR3" pkg="gazebo_ros" type="spawn_model" args="-urdf -unpause
+    -param robot_description -model robot
+    -z 0.9 -y -0.127 -x -1.15
+    -J robot::shoulder_pan_joint 0 -J robot::shoulder_lift_joint -1.0996 -J robot::elbow_joint 1.9199
+    -J robot::wrist_1_joint -0.7858 -J robot::wrist_2_joint 1.57079 -J robot::wrist_3_joint 1.7639" respawn="false" output="screen" />
+
+  <!-- <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model robot -z 0.1" respawn="false" output="screen" /> -->
+
+  <!-- publisher node -->
+
+  <include file="$(find ur_gazebo)/launch/controller_utils.launch"/>
+
+  <rosparam file="$(find ur_gazebo)/controller/arm_controller_ur3.yaml" command="load"/>
+  <node name="arm_controller_spawner" pkg="controller_manager" type="controller_manager"
+     args="spawn arm_controller" respawn="false" output="screen"/>
+
+  <!-- load other controllers -->
+  <node name="ros_control_controller_manager" pkg="controller_manager" type="controller_manager" respawn="false" output="screen" args="load joint_group_position_controller" />
+
+  <!-- launch ur3_moveit_planning_execution -->
+  <include file="$(find ur3_moveit_config)/launch/ur3_moveit_planning_execution.launch">
+   <arg name="sim" value="$(arg sim)"/>
+   <arg name="limited" value="$(arg limited)"/>
+  </include>
+
+  <!-- Launch moveit_rviz -->
+  <include file="$(find ur3_moveit_config)/launch/moveit_rviz.launch">
+  <arg name="config" value="$(arg config)"/>
+  </include>
+
+  <!-- run nodes -->
+  <node name="joy_node" pkg="joy" type="joy_node" >
+    <param name="dev" type="string" value="/dev/input/js0"/>
+    <param name="deadzone" value="0.12"/>
+  </node>
+
+  <!-- <node name="ur_cart" pkg="jog_ur3" type="ur_cart.py" output="screen" /> -->
+
+  <!-- <node name="tf_echo" pkg="jog_ur3" type="tf_echo.py" output="screen" />
+
+  <node name="initial_node" pkg="jog_ur3" type="initial_node.py" output="screen" />
+
+  <node name="UR3_Xbox" pkg="jog_ur3" type="UR3_Xbox" output="screen" />
+
+  <node name="jog_arm_server" pkg="jog_ur3" type="jog_arm_server" output="screen" >
+    <param name="parameter_ns" type="string" value="jog_arm_server" />
+    <rosparam command="load" file="$(find jog_ur3)/config/jog_settings.yaml" />
+  </node> -->
+
+
+</launch>

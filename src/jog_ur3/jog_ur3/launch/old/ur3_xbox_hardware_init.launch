@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="debug" default="false" />
+  <arg unless="$(arg debug)" name="launch_prefix" value="" />
+  <arg     if="$(arg debug)" name="launch_prefix" value="gdb --ex run --args" />
+
+  <include file="$(find jog_ur3)/launch/ur3_ros_control.launch">
+    <arg name="robot_ip" default="192.168.1.4"/>
+    <arg name="limited" default="True"/>
+  </include>
+  
+  <!-- Launch moveit -->
+  <include file="$(find ur3_moveit_config)/launch/move_group.launch">
+    <arg name="limited" default="True"/>
+  </include>
+
+  <arg name="config" default="true" />
+  <arg unless="$(arg config)" name="command_args" value="" />
+  <arg     if="$(arg config)" name="command_args" value="-d $(find ur3_moveit_config)/launch/moveit.rviz" />
+
+  <!-- Run Rviz and load the default config to see the state of the move_group node -->
+  <include file="$(find ur3_moveit_config)/launch/moveit_rviz.launch">
+    <arg name="config" value="true"/>
+    <arg name="debug" value="$(arg debug)"/>
+  </include>
+
+</launch>

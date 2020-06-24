@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+  <include file="$(find jog_ur3)/launch/hardware_standard_init.launch">
+  </include>
+
+  <include file="$(find jog_ur3)/launch/ur3_jog_with_xbox.launch">
+  </include>
+
+</launch>

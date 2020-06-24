@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="debug" default="false" />
+  <!-- Connect to the UR3 -->
+  <include file="$(find ur_robot_driver)/launch/ur3_bringup.launch">
+    <arg name="robot_ip" default="192.168.1.4"/>
+    <arg name="limited" default="False"/>
+    <arg name="kinematics_config" default="$(find ur_calibration)/my_robot_calibration.yaml"/>
+  </include>
+  <!-- Launch moveit -->
+  <include file="$(find ur3_moveit_config)/launch/ur3_moveit_planning_execution.launch">
+    <arg name="limited" default="True"/>
+    <arg name="debug" default="False" />
+  </include>
+
+  <arg name="config" default="true" />
+  <arg unless="$(arg config)" name="command_args" value="" />
+  <arg     if="$(arg config)" name="command_args" value="-d $(find ur3_moveit_config)/launch/moveit.rviz" />
+
+  <!-- Run Rviz and load the default config to see the state of the move_group node -->
+  <include file="$(find ur3_moveit_config)/launch/moveit_rviz.launch">
+    <arg name="config" value="true"/>
+    <arg name="debug" value="$(arg debug)"/>
+  </include>
+
+  <node name="ft_sensor" pkg="robotiq_ft_sensor" type="ft_sensor" respawn="true" output="screen">
+      <param name="frame_id" type="str" value="robotiq_ft_frame_id" />
+      <param name="serial_id" type="str" value="ttyUSB0" />
+  </node>
+
+
+</launch>

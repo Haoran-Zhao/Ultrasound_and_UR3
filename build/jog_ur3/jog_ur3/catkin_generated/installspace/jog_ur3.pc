@@ -1,0 +1,8 @@
+prefix=/home/haoran/UR_ws/install
+
+Name: jog_ur3
+Description: Description of jog_ur3
+Version: 0.0.3
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: rospy roscpp moveit_ros_manipulation moveit_ros_move_group moveit_ros_planning_interface tf kdl_parser robotiq_ft_sensor
