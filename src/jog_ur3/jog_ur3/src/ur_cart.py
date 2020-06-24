@@ -186,7 +186,7 @@ class UR3CartROS(object):
         c = np.dot(a, b)
         s = np.linalg.norm(v)
         kmat = np.array([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]])
-        rotation_matrix = np.eye(3) + kmat + kmat.dot(kmat) * ((1 - c) / (s ** 2))
+        rotation_matrix = np.eye(3) + kmat + kmat.dot(kmat) / (1+c)
         return rotation_matrix
 
     def cal_RPY(self, rot):
@@ -211,14 +211,16 @@ class UR3CartROS(object):
         self.ft_data[0] = ft_msg.wrench.force.x
         self.ft_data[1] = ft_msg.wrench.force.y
         self.ft_data[2] = -ft_msg.wrench.force.z
+        ft_norm = np.around(np.abs(self.ft_data[2]), decimals=1)
         # print('contacted force: {}'.format(np.linalg.norm(self.ft_data)))
         if self.ft_data[0] > 1 or self.ft_data[1] > 1 or self.ft_data[2] > 1:
             self.contacted =1
-            if np.linalg.norm(self.ft_data) > 1.5:
-                vel = 1 if (np.linalg.norm(self.ft_data)-1.5)*5 >1 else (np.linalg.norm(self.ft_data)-1.5)*5
+            if ft_norm > 2.5:
+                print('ft_z:{}'.format(ft_norm))
+                vel = 1 if (ft_norm-2.5) >1 else max((ft_norm-2.5), 0.1)
 
-            elif np.linalg.norm(self.ft_data) < 1:
-                vel = -1 if (1-np.linalg.norm(self.ft_data))*5 >1 else -(1-np.linalg.norm(self.ft_data))*5
+            elif ft_norm < 1.5:
+                vel = -1 if (1.5-ft_norm) >1 else -max((1.5-ft_norm), 0.1)
             else:
                 vel = 0.0
 
@@ -235,13 +237,17 @@ class UR3CartROS(object):
             self.twist.angular.y = pitch
             self.twist.angular.z = roll
 
-        elif self.contacted == 0:
-            self.twist.linear.x = -0.5
+        elif self.contacted == 0 or (self.contacted == 1 and ft_norm <1):
+            if self.twist.linear.x == 0:
+                self.twist.linear.x = -0.2
+            else:
+                self.twist.linear.x = -(1-np.abs(self.ft_data[2])*0.9)
             self.twist.linear.y = 0
             self.twist.linear.z = 0
             self.twist.angular.x = 0
             self.twist.angular.y = 0
             self.twist.angular.z = 0
+
         else:
             self.twist.linear.x = 0
             self.twist.linear.y = 0
@@ -270,7 +276,6 @@ class UR3CartROS(object):
         elif self.flag_docking ==1:
 
             rospy.loginfo('start docking...')
-            flag_start =1
             while True:
                 twiststamped  = TwistStamped()
                 twiststamped.header.stamp = rospy.Time.now()
@@ -281,9 +286,11 @@ class UR3CartROS(object):
                     twiststamped.twist.linear.y = 0.0
                     twiststamped.twist.linear.z = 0.0
                     twiststamped.twist.angular.x = 0.0
-                    twiststamped.twist.angular.y = np.sign(self.twist.angular.y)*0.5
-                    twiststamped.twist.angular.z = np.sign(self.twist.angular.z)*0.5
-                    print(twiststamped.twist.linear.x, twiststamped.twist.angular.y, twiststamped.twist.angular.z)
+                    angular_y = np.sign(self.twist.angular.y)*0.5 if (np.abs(self.twist.angular.y) - 3)*0.05 >0.5 else np.sign(self.twist.angular.y) * max((np.abs(self.twist.angular.y) - 3)*0.1, 0.1)
+                    twiststamped.twist.angular.y = angular_y
+                    angular_z = np.sign(self.twist.angular.z)*0.5 if (np.abs(self.twist.angular.z) - 3)*0.05 >0.5 else np.sign(self.twist.angular.z) * max((np.abs(self.twist.angular.z) - 3)*0.1, 0.1)
+                    twiststamped.twist.angular.z = angular_z
+                    # print(twiststamped.twist.linear.x, twiststamped.twist.angular.y, twiststamped.twist.angular.z)
                 else:
                     twiststamped.twist.linear.x = self.twist.linear.x
                     twiststamped.twist.linear.y = 0.0
@@ -291,33 +298,41 @@ class UR3CartROS(object):
                     twiststamped.twist.angular.x = 0.0
                     twiststamped.twist.angular.y = 0.0
                     twiststamped.twist.angular.z = 0.0
+
+                print ('contacted:{},linear.x: {}, angular.y:{}, angular.z:{}'.format(self.contacted, twiststamped.twist.linear.x,twiststamped.twist.angular.y,twiststamped.twist.angular.z))
                 self.twist_pub.publish(twiststamped)
 
-                if self.contacted==1 and self.twist.angular.y <= 3 and self.twist.angular.z <= 3 and 1.5 <= np.abs(self.ft_data[2]) and np.abs(self.ft_data[2]) <=2.5:
-                    self.contacted = 0
+                if self.contacted==1 and np.abs(self.twist.angular.y) <= 5 and np.abs(self.twist.angular.z) <= 5 and 1.5 <= np.abs(self.ft_data[2]) and np.abs(self.ft_data[2]) <=2.5:
                     break
-
+            twiststamped.twist.linear.x = 0.0
+            twiststamped.twist.linear.y = 0.0
+            twiststamped.twist.linear.z = 0.0
+            twiststamped.twist.angular.x = 0.0
+            twiststamped.twist.angular.y = 0.0
+            twiststamped.twist.angular.z = 0.0
+            self.twist_pub.publish(twiststamped)
+            print ('pitch:{},yaw:{}, force_Z:{}'.format(self.twist.angular.y, self.twist.angular.y, np.abs(self.ft_data[2])))
             rospy.loginfo("docking completed, contacted:{}".format(self.contacted))
 
 
-        else:
-            twist_ft = Twist()
-            if np.abs(self.twist.angular.y) > 5 or np.abs(self.twist.angular.z) > 5:
-                twist_ft.linear.x = 0.0
-                twist_ft.linear.y = 0.0
-                twist_ft.linear.z = 0.0
-                twist_ft.angular.x = 0.0
-                twist_ft.angular.y = np.sign(self.twist.angular.y)*0.5
-                twist_ft.angular.z = np.sign(self.twist.angular.z)*0.5
-                print(twist_ft.angular.y, twist_ft.angular.z)
-            else:
-                twist_ft.linear.x = 0.0
-                twist_ft.linear.y = 0.0
-                twist_ft.linear.z = 0.0
-                twist_ft.angular.x = 0.0
-                twist_ft.angular.y = 0.0
-                twist_ft.angular.z = 0.0
-            self.ft_orien_pub.publish(twist_ft)
+        # else:
+        #     twist_ft = Twist()
+        #     if np.abs(self.twist.angular.y) > 5 or np.abs(self.twist.angular.z) > 5:
+        #         twist_ft.linear.x = 0.0
+        #         twist_ft.linear.y = 0.0
+        #         twist_ft.linear.z = 0.0
+        #         twist_ft.angular.x = 0.0
+        #         twist_ft.angular.y = np.sign(self.twist.angular.y)*0.5
+        #         twist_ft.angular.z = np.sign(self.twist.angular.z)*0.5
+        #         # print(twist_ft.angular.y, twist_ft.angular.z)
+        #     else:
+        #         twist_ft.linear.x = 0.0
+        #         twist_ft.linear.y = 0.0
+        #         twist_ft.linear.z = 0.0
+        #         twist_ft.angular.x = 0.0
+        #         twist_ft.angular.y = 0.0
+        #         twist_ft.angular.z = 0.0
+        #     self.ft_orien_pub.publish(twist_ft)
 
 
         # elif self.flag_init_pos==1:
