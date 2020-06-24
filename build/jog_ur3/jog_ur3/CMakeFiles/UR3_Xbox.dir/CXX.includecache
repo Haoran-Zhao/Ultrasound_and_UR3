@@ -33,6 +33,8 @@ jog_msgs/JogJoint.h
 /home/haoran/UR_ws/src/jog_ur3/jog_ur3/src/jog_msgs/JogJoint.h
 ros/ros.h
 /home/haoran/UR_ws/src/jog_ur3/jog_ur3/src/ros/ros.h
+ros/console.h
+-
 sensor_msgs/Joy.h
 /home/haoran/UR_ws/src/jog_ur3/jog_ur3/src/sensor_msgs/Joy.h
 geometry_msgs/Twist.h
