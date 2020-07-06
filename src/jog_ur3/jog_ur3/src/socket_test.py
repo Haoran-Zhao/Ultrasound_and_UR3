@@ -14,7 +14,7 @@ if __name__=='__main__':
     PORT = 63351
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        print("Connecting to" + HOST)
+        print("Connecting to " + HOST)
         s.connect((HOST,PORT))
     except:
         print("NO connection")

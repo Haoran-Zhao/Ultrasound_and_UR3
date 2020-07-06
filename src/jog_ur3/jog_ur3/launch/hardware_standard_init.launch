@@ -23,10 +23,11 @@
     <arg name="debug" value="$(arg debug)"/>
   </include>
 
-  <node name="ft_sensor" pkg="robotiq_ft_sensor" type="ft_sensor" respawn="true" output="screen">
+  <!-- <node name="ft_sensor" pkg="robotiq_ft_sensor" type="ft_sensor" respawn="true" output="screen">
       <param name="frame_id" type="str" value="robotiq_ft_frame_id" />
       <param name="serial_id" type="str" value="ttyUSB0" />
-  </node>
+  </node> -->
+  <node name="ft_socket" pkg="jog_ur3" type="socket_test.py" output="screen" />
 
 
 </launch>
