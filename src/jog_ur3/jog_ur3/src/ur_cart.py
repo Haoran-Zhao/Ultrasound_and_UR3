@@ -18,8 +18,15 @@ import numpy as np
 class UR3CartROS(object):
     def __init__(self):
 
+        self.ft_data = [0.0, 0.0, 0.0]
+        self.orien_goal = [0.0, 0.0, 1.0]
+        self.contacted = 0
+        self.flag_docking = 0
+        self.twist = Twist()
+
         self.base_link = 'base_link'
         self.ee_link = 'ee_link'
+
         flag, self.tree = kdl_parser.treeFromParam('/robot_description')
         self.chain = self.tree.getChain(self.base_link, self.ee_link)
         self.num_joints=self.tree.getNrOfJoints()
@@ -33,9 +40,8 @@ class UR3CartROS(object):
 
         rospy.init_node('ur_ee_vel_controller')
         rospy.Subscriber('/joint_state', JointState, self.arm_joint_state_cb)
-
+        rospy.Subscriber('ft_data', Twist, self.ft_cb, queue_size=1)
         rospy.Subscriber('/joy', Joy, self.joy_cb, queue_size=1)
-        rospy.Subscriber('robotiq_ft_wrench', WrenchStamped, self.ft_cb, queue_size=10)
         self.joint_vel_cmd_pub = rospy.Publisher('/joint_group_vel_controller/command', Float64MultiArray, queue_size=10)
         self.joint_pos_cmd_pub = rospy.Publisher('/scaled_pos_traj_controller/command', JointTrajectory, queue_size=10)
         self.speed_scaling_pub = rospy.Publisher('/speed_scaling_factor', Float64, queue_size=1)
@@ -44,30 +50,25 @@ class UR3CartROS(object):
         self.speed_scaling_pub.publish(Float64(0.3))
 
         self.switch_controller_cli = rospy.ServiceProxy('controller_manager/switch_controller', SwitchController)
-        self.ft_sensor_cli = rospy.ServiceProxy('robotiq_ft_sensor_acc', sensor_accessor)
+        # rospy.Subscriber('robotiq_ft_wrench', WrenchStamped, self.ft_cb, queue_size=10)
+        # self.ft_sensor_cli = rospy.ServiceProxy('robotiq_ft_sensor_acc', sensor_accessor)
         self.joint_pos_cli = actionlib.SimpleActionClient('scaled_pos_traj_controller/follow_joint_trajectory', FollowJointTrajectoryAction)
 
         self.tf_listener = tf.TransformListener()
-
-        self.ft_data = [0.0, 0.0, 0.0]
-        self.orien_goal = [0.0, 0.0, 1.0]
-        self.contacted = 0
-        self.twist = Twist()
-
-        self.reset_ft_sensor()
+        # self.reset_ft_sensor()
 
         rospy.sleep(0.5)
 
 
-    def reset_ft_sensor(self):
-        rospy.wait_for_service('robotiq_ft_sensor_acc')
-        try:
-            print('Service is ready, reset force sensor...')
-            self.ft_sensor_cli(8,"")
-            print('Done')
-
-        except rospy.ServiceException as e:
-            print("Service call fialed: %s" %e)
+    # def reset_ft_sensor(self):
+    #     rospy.wait_for_service('robotiq_ft_sensor_acc')
+    #     try:
+    #         print('Service is ready, reset force sensor...')
+    #         self.ft_sensor_cli(8,"")
+    #         print('Done')
+    #
+    #     except rospy.ServiceException as e:
+    #         print("Service call fialed: %s" %e)
 
 
     def switch_controller(self, mode = None):
@@ -208,19 +209,22 @@ class UR3CartROS(object):
         return roll, pitch, yaw
 
     def ft_cb(self, ft_msg):
-        self.ft_data[0] = ft_msg.wrench.force.x
-        self.ft_data[1] = ft_msg.wrench.force.y
-        self.ft_data[2] = -ft_msg.wrench.force.z
+        # self.ft_data[0] = ft_msg.wrench.force.x
+        # self.ft_data[1] = ft_msg.wrench.force.y
+        # self.ft_data[2] = -ft_msg.wrench.force.z
+        self.ft_data[0] = ft_msg.linear.x
+        self.ft_data[1] = ft_msg.linear.y
+        self.ft_data[2] = -ft_msg.linear.z
         ft_norm = np.around(np.abs(self.ft_data[2]), decimals=1)
         # print('contacted force: {}'.format(np.linalg.norm(self.ft_data)))
-        if self.ft_data[0] > 1 or self.ft_data[1] > 1 or self.ft_data[2] > 1:
+        if self.flag_docking ==1 and (self.ft_data[0] > 1 or self.ft_data[1] > 1 or self.ft_data[2] > 1):
             self.contacted =1
             if ft_norm > 2.5:
-                print('ft_z:{}'.format(ft_norm))
-                vel = 1 if (ft_norm-2.5) >1 else max((ft_norm-2.5), 0.1)
+                rospy.loginfo('ft_z:{}'.format(ft_norm))
+                vel = 0.5 if (ft_norm-2.5) >0.5 else max(np.abs(ft_norm-2.5), 0.1)
 
             elif ft_norm < 1.5:
-                vel = -1 if (1.5-ft_norm) >1 else -max((1.5-ft_norm), 0.1)
+                vel = -0.5 if (1.5-ft_norm) >0.5 else -max((1.5-ft_norm), 0.1)
             else:
                 vel = 0.0
 
@@ -241,7 +245,8 @@ class UR3CartROS(object):
             if self.twist.linear.x == 0:
                 self.twist.linear.x = -0.2
             else:
-                self.twist.linear.x = -(1-np.abs(self.ft_data[2])*0.9)
+                self.twist.linear.x = -0.5 if (1-np.abs(self.ft_data[2])*0.7) > 0.5 else -max((1-np.abs(self.ft_data[2])*0.7),0.1)
+
             self.twist.linear.y = 0
             self.twist.linear.z = 0
             self.twist.angular.x = 0
@@ -271,7 +276,7 @@ class UR3CartROS(object):
             rospy.sleep(1)
             self.flag_init_joint=0
             self.contacted = 0
-            self.reset_ft_sensor()
+            # self.reset_ft_sensor()
 
         elif self.flag_docking ==1:
 
@@ -283,13 +288,15 @@ class UR3CartROS(object):
                 # print ('linear.x: {}'.format(self.twist.linear.x))
                 if self.contacted==1 and (np.abs(self.twist.angular.y) > 3 or np.abs(self.twist.angular.z) > 3):
                     twiststamped.twist.linear.x = self.twist.linear.x
-                    twiststamped.twist.linear.y = 0.0
-                    twiststamped.twist.linear.z = 0.0
+
                     twiststamped.twist.angular.x = 0.0
-                    angular_y = np.sign(self.twist.angular.y)*0.5 if (np.abs(self.twist.angular.y) - 3)*0.05 >0.5 else np.sign(self.twist.angular.y) * max((np.abs(self.twist.angular.y) - 3)*0.1, 0.1)
+                    angular_y = np.sign(self.twist.angular.y)*0.5 if (np.abs(self.twist.angular.y) - 3)*0.05 >0.5 else np.sign(self.twist.angular.y) * max(np.around((np.abs(self.twist.angular.y) - 3)*0.05,decimals=1), 0.1)
                     twiststamped.twist.angular.y = angular_y
-                    angular_z = np.sign(self.twist.angular.z)*0.5 if (np.abs(self.twist.angular.z) - 3)*0.05 >0.5 else np.sign(self.twist.angular.z) * max((np.abs(self.twist.angular.z) - 3)*0.1, 0.1)
+                    angular_z = np.sign(self.twist.angular.z)*0.5 if (np.abs(self.twist.angular.z) - 3)*0.05 >0.5 else np.sign(self.twist.angular.z) * max(np.around((np.abs(self.twist.angular.z) - 3)*0.05,decimals=1), 0.1)
                     twiststamped.twist.angular.z = angular_z
+
+                    twiststamped.twist.linear.y = -angular_z
+                    twiststamped.twist.linear.z = -angular_y
                     # print(twiststamped.twist.linear.x, twiststamped.twist.angular.y, twiststamped.twist.angular.z)
                 else:
                     twiststamped.twist.linear.x = self.twist.linear.x
@@ -298,8 +305,8 @@ class UR3CartROS(object):
                     twiststamped.twist.angular.x = 0.0
                     twiststamped.twist.angular.y = 0.0
                     twiststamped.twist.angular.z = 0.0
-
-                print ('contacted:{},linear.x: {}, angular.y:{}, angular.z:{}'.format(self.contacted, twiststamped.twist.linear.x,twiststamped.twist.angular.y,twiststamped.twist.angular.z))
+                rospy.loginfo('contacted:{},angular.x: {}, angular.y:{}, angular.z:{}'.format(self.contacted, twiststamped.twist.angular.x, twiststamped.twist.angular.y, twiststamped.twist.angular.z))
+                rospy.loginfo('contacted:{},linear.x: {}, linear.y:{}, linear.z:{}'.format(self.contacted, twiststamped.twist.linear.x, twiststamped.twist.linear.y, twiststamped.twist.linear.z))
                 self.twist_pub.publish(twiststamped)
 
                 if self.contacted==1 and np.abs(self.twist.angular.y) <= 5 and np.abs(self.twist.angular.z) <= 5 and 1.5 <= np.abs(self.ft_data[2]) and np.abs(self.ft_data[2]) <=2.5:
@@ -311,7 +318,7 @@ class UR3CartROS(object):
             twiststamped.twist.angular.y = 0.0
             twiststamped.twist.angular.z = 0.0
             self.twist_pub.publish(twiststamped)
-            print ('pitch:{},yaw:{}, force_Z:{}'.format(self.twist.angular.y, self.twist.angular.y, np.abs(self.ft_data[2])))
+            # print ('pitch:{},yaw:{}, force_Z:{}'.format(self.twist.angular.y, self.twist.angular.y, np.abs(self.ft_data[2])))
             rospy.loginfo("docking completed, contacted:{}".format(self.contacted))
 
 
