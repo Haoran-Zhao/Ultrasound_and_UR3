@@ -295,8 +295,9 @@ class UR3CartROS(object):
                     angular_z = np.sign(self.twist.angular.z)*0.5 if (np.abs(self.twist.angular.z) - 3)*0.05 >0.5 else np.sign(self.twist.angular.z) * max(np.around((np.abs(self.twist.angular.z) - 3)*0.05,decimals=1), 0.1)
                     twiststamped.twist.angular.z = angular_z
 
-                    twiststamped.twist.linear.y = -angular_z
-                    twiststamped.twist.linear.z = -angular_y
+                    twiststamped.twist.linear.y = np.round(angular_z, decimals=1)
+                    twiststamped.twist.linear.z = -np.round(angular_y, decimals=1)
+                    rospy.loginfo('contacted:{},angular.x: {}, angular.y:{}, angular.z:{}'.format(self.contacted, twiststamped.twist.angular.x, angular_y, angular_z))
                     # print(twiststamped.twist.linear.x, twiststamped.twist.angular.y, twiststamped.twist.angular.z)
                 else:
                     twiststamped.twist.linear.x = self.twist.linear.x
@@ -305,7 +306,6 @@ class UR3CartROS(object):
                     twiststamped.twist.angular.x = 0.0
                     twiststamped.twist.angular.y = 0.0
                     twiststamped.twist.angular.z = 0.0
-                rospy.loginfo('contacted:{},angular.x: {}, angular.y:{}, angular.z:{}'.format(self.contacted, twiststamped.twist.angular.x, twiststamped.twist.angular.y, twiststamped.twist.angular.z))
                 rospy.loginfo('contacted:{},linear.x: {}, linear.y:{}, linear.z:{}'.format(self.contacted, twiststamped.twist.linear.x, twiststamped.twist.linear.y, twiststamped.twist.linear.z))
                 self.twist_pub.publish(twiststamped)
 
