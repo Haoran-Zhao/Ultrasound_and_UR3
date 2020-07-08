@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: ur3_with_ultrasound_probe
+    relative_path: urdf/ur3_with_ultrasound_probe.urdf
+    xacro_args: ""
+  SRDF:
+    relative_path: config/ur3_with_ultrasound_probe.srdf
+  CONFIG:
+    author_name: Haoran Zhao
+    author_email: zhaohaorandl@gmail.com
+    generated_timestamp: 1594240728

@@ -1,0 +1,8 @@
+prefix=/home/haoran/UR_ws/install
+
+Name: ur3_with_measurement_tool
+Description: Description of ur3_with_measurement_tool
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

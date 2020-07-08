@@ -1,0 +1,8 @@
+prefix=/home/haoran/UR_ws/devel
+
+Name: ur3_with_ultrasound_probe
+Description: Description of ur3_with_ultrasound_probe
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
