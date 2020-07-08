@@ -86,3 +86,5 @@ roslaunch jog_ur3 ur3_hardware.launch
 
 change linear speed in [`ur3_test.yaml`](https://github.com/Haoran-Zhao/US_UR3/blob/master/src/jog_ur3/jog_ur3/config/ur3_test.yaml)
 
+##### 4.3 add tool and TCP on UR3
+[`Creating a URDF with an UR5 robot and a custom end-effector`](https://gramaziokohler.github.io/compas_fab/latest/examples/03_backends_ros/07_ros_create_urdf_ur5_with_measurement_tool.html)
