@@ -221,10 +221,10 @@ class UR3CartROS(object):
             self.contacted =1
             if ft_norm > 2.5:
                 rospy.loginfo('ft_z:{}'.format(ft_norm))
-                vel = 0.5 if (ft_norm-2.5) >0.5 else max(np.abs(ft_norm-2.5), 0.1)
+                vel = 0.3 if (ft_norm-2.5) >0.3 else max(np.abs(ft_norm-2.5), 0.1)
 
             elif ft_norm < 1.5:
-                vel = -0.5 if (1.5-ft_norm) >0.5 else -max((1.5-ft_norm), 0.1)
+                vel = -0.3 if (1.5-ft_norm) >0.3 else -max((1.5-ft_norm), 0.1)
             else:
                 vel = 0.0
 
@@ -245,7 +245,7 @@ class UR3CartROS(object):
             if self.twist.linear.x == 0:
                 self.twist.linear.x = -0.2
             else:
-                self.twist.linear.x = -0.5 if (1-np.abs(self.ft_data[2])*0.7) > 0.5 else -max((1-np.abs(self.ft_data[2])*0.7),0.1)
+                self.twist.linear.x = -0.3 if (1-np.abs(self.ft_data[2])*0.7) > 0.3 else -max((1-np.abs(self.ft_data[2])*0.7),0.1)
 
             self.twist.linear.y = 0
             self.twist.linear.z = 0

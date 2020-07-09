@@ -6,6 +6,6 @@ moveit_setup_assistant_config:
   SRDF:
     relative_path: config/ur3_with_ultrasound_probe.srdf
   CONFIG:
-    author_name: Haoran Zhao
+    author_name: HaoranZhao
     author_email: zhaohaorandl@gmail.com
-    generated_timestamp: 1594240728
+    generated_timestamp: 1594323679
