@@ -23,6 +23,7 @@ class UR3CartROS(object):
         self.contacted = 0
         self.flag_docking = 0
         self.twist = Twist()
+        self.vel_lst = 0
 
         self.base_link = 'base_link'
         self.ee_link = 'ee_link'
@@ -208,6 +209,17 @@ class UR3CartROS(object):
         roll, pitch, yaw = self.cal_RPY(rot)
         return roll, pitch, yaw
 
+    def vel_smooth(self,vel_lst, vel_in):
+        step = 0.001
+        dif = vel_in - vel_lst
+
+        if dif > step:
+            vel_out = vel_lst + step * np.sign(vel_in - vel_lst)
+        else:
+            vel_out = vel_in
+
+        return vel_out
+
     def ft_cb(self, ft_msg):
         # self.ft_data[0] = ft_msg.wrench.force.x
         # self.ft_data[1] = ft_msg.wrench.force.y
@@ -285,9 +297,10 @@ class UR3CartROS(object):
                 twiststamped  = TwistStamped()
                 twiststamped.header.stamp = rospy.Time.now()
                 # print ('roll:{},pitch:{},yaw:{}'.format(self.twist.angular.x, self.twist.angular.y, self.twist.angular.y))
-                # print ('linear.x: {}'.format(self.twist.linear.x))
+                vel_sm = self.vel_smooth(self.vel_lst, self.twist.linear.x)
+                rospy.loginfo('linear.x_in: {}, linear_x_sm: {}'.format(self.twist.linear.x, vel_sm))
                 if self.contacted==1 and (np.abs(self.twist.angular.y) > 3 or np.abs(self.twist.angular.z) > 3):
-                    twiststamped.twist.linear.x = self.twist.linear.x
+                    twiststamped.twist.linear.x = vel_sm
 
                     twiststamped.twist.angular.x = 0.0
                     angular_y = np.sign(self.twist.angular.y)*0.5 if (np.abs(self.twist.angular.y) - 3)*0.05 >0.5 else np.sign(self.twist.angular.y) * max(np.around((np.abs(self.twist.angular.y) - 3)*0.05,decimals=1), 0.1)
@@ -297,17 +310,18 @@ class UR3CartROS(object):
 
                     twiststamped.twist.linear.y = np.round(angular_z, decimals=1)
                     twiststamped.twist.linear.z = -np.round(angular_y, decimals=1)
-                    rospy.loginfo('contacted:{},angular.x: {}, angular.y:{}, angular.z:{}'.format(self.contacted, twiststamped.twist.angular.x, angular_y, angular_z))
+                    # rospy.loginfo('contacted:{},angular.x: {}, angular.y:{}, angular.z:{}'.format(self.contacted, twiststamped.twist.angular.x, angular_y, angular_z))
                     # print(twiststamped.twist.linear.x, twiststamped.twist.angular.y, twiststamped.twist.angular.z)
                 else:
-                    twiststamped.twist.linear.x = self.twist.linear.x
+                    twiststamped.twist.linear.x = vel_sm
                     twiststamped.twist.linear.y = 0.0
                     twiststamped.twist.linear.z = 0.0
                     twiststamped.twist.angular.x = 0.0
                     twiststamped.twist.angular.y = 0.0
                     twiststamped.twist.angular.z = 0.0
-                rospy.loginfo('contacted:{},linear.x: {}, linear.y:{}, linear.z:{}'.format(self.contacted, twiststamped.twist.linear.x, twiststamped.twist.linear.y, twiststamped.twist.linear.z))
+                # rospy.loginfo('contacted:{},linear.x: {}, linear.y:{}, linear.z:{}'.format(self.contacted, twiststamped.twist.linear.x, twiststamped.twist.linear.y, twiststamped.twist.linear.z))
                 self.twist_pub.publish(twiststamped)
+                self.vel_lst = twiststamped.twist.linear.x
 
                 if self.contacted==1 and np.abs(self.twist.angular.y) <= 5 and np.abs(self.twist.angular.z) <= 5 and 1.5 <= np.abs(self.ft_data[2]) and np.abs(self.ft_data[2]) <=2.5:
                     break
@@ -318,6 +332,8 @@ class UR3CartROS(object):
             twiststamped.twist.angular.y = 0.0
             twiststamped.twist.angular.z = 0.0
             self.twist_pub.publish(twiststamped)
+            self.vel_lst = 0
+
             # print ('pitch:{},yaw:{}, force_Z:{}'.format(self.twist.angular.y, self.twist.angular.y, np.abs(self.ft_data[2])))
             rospy.loginfo("docking completed, contacted:{}".format(self.contacted))
 
