@@ -26,6 +26,8 @@ class UR3CartROS(object):
         self.vel_lst = 0
         self.init_pos = Bool()
         self.init_pos.data = False
+        self.docked = Bool()
+        self.docked.data = False
 
         self.base_link = 'base_link'
         self.ee_link = 'ee_link'
@@ -49,6 +51,7 @@ class UR3CartROS(object):
         self.joint_pos_cmd_pub = rospy.Publisher('/scaled_pos_traj_controller/command', JointTrajectory, queue_size=10)
         self.speed_scaling_pub = rospy.Publisher('/speed_scaling_factor', Float64, queue_size=1)
         self.init_pub = rospy.Publisher('init_flg', Bool, queue_size=1 )
+        self.docked_pub = rospy.Publisher('docked_flg', Bool, queue_size=1 )
 
         self.twist_pub = rospy.Publisher('jog_arm_server/delta_jog_cmds', TwistStamped, queue_size=1)
         self.ft_orien_pub = rospy.Publisher('ft_orien', Twist, queue_size=1)
@@ -62,6 +65,7 @@ class UR3CartROS(object):
         self.tf_listener = tf.TransformListener()
         # self.reset_ft_sensor()
         self.init_pub.publish(self.init_pos)
+        self.docked_pub.publish(self.docked)
         # rospy.sleep(0.5)
 
 
@@ -284,11 +288,12 @@ class UR3CartROS(object):
         self.flag_init_joint = joy_msg.buttons[3]
         self.init_pos.data = False
         self.init_pub.publish(self.init_pos)
-
         if self.flag_init_joint==1:
             rospy.loginfo("start initialize joint...")
             self.init_pos.data = True
             self.init_pub.publish(self.init_pos)
+            self.docked.data = False
+            self.docked_pub.publish(self.docked)
             eef_home_joint = [-math.pi, -1.211, 1.92553, -0.71161395, math.pi/2, math.pi/2]
             # eef_home_joint = [0.007588, -1.211, 1.92553, -0.71161395, math.pi/2, math.pi/2]
             # eef_home_joint = [0, -1.1123, 1.9444, -math.pi/4, math.pi/2, math.pi/2]
@@ -348,7 +353,8 @@ class UR3CartROS(object):
 
             # print ('pitch:{},yaw:{}, force_Z:{}'.format(self.twist.angular.y, self.twist.angular.y, np.abs(self.ft_data[2])))
             rospy.loginfo("docking completed, contacted:{}".format(self.contacted))
-
+            self.docked.data = True
+            self.docked_pub.publish(self.docked)
 
         # else:
         #     twist_ft = Twist()
