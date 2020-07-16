@@ -7,7 +7,7 @@ import kdl_parser_py.urdf as kdl_parser
 from sensor_msgs.msg import JointState, Joy
 from geometry_msgs.msg import Twist, Pose, TwistStamped, WrenchStamped
 from trajectory_msgs.msg import JointTrajectoryPoint, JointTrajectory
-from std_msgs.msg import Float64MultiArray, Float64
+from std_msgs.msg import Float64MultiArray, Float64, Bool
 from controller_manager_msgs.srv import SwitchController, SwitchControllerRequest, SwitchControllerResponse
 from control_msgs.msg import FollowJointTrajectoryGoal, FollowJointTrajectoryAction
 from robotiq_ft_sensor.srv import sensor_accessor
@@ -24,6 +24,8 @@ class UR3CartROS(object):
         self.flag_docking = 0
         self.twist = Twist()
         self.vel_lst = 0
+        self.init_pos = Bool()
+        self.init_pos.data = False
 
         self.base_link = 'base_link'
         self.ee_link = 'ee_link'
@@ -46,6 +48,8 @@ class UR3CartROS(object):
         self.joint_vel_cmd_pub = rospy.Publisher('/joint_group_vel_controller/command', Float64MultiArray, queue_size=10)
         self.joint_pos_cmd_pub = rospy.Publisher('/scaled_pos_traj_controller/command', JointTrajectory, queue_size=10)
         self.speed_scaling_pub = rospy.Publisher('/speed_scaling_factor', Float64, queue_size=1)
+        self.init_pub = rospy.Publisher('init_flg', Bool, queue_size=1 )
+
         self.twist_pub = rospy.Publisher('jog_arm_server/delta_jog_cmds', TwistStamped, queue_size=1)
         self.ft_orien_pub = rospy.Publisher('ft_orien', Twist, queue_size=1)
         self.speed_scaling_pub.publish(Float64(0.3))
@@ -57,8 +61,8 @@ class UR3CartROS(object):
 
         self.tf_listener = tf.TransformListener()
         # self.reset_ft_sensor()
-
-        rospy.sleep(0.5)
+        self.init_pub.publish(self.init_pos)
+        # rospy.sleep(0.5)
 
 
     # def reset_ft_sensor(self):
@@ -273,26 +277,34 @@ class UR3CartROS(object):
             self.twist.angular.y = 0
             self.twist.angular.z = 0
 
+
     def joy_cb(self, joy_msg):
         #    left axis 0 1  right axis 3 4  LB buttons 4 RB buttons 5 X buttons 2 Y buttons 3 A buttons 1 B buttons 2
         self.flag_docking = joy_msg.buttons[2]
         self.flag_init_joint = joy_msg.buttons[3]
+        self.init_pos.data = False
+        self.init_pub.publish(self.init_pos)
 
         if self.flag_init_joint==1:
             rospy.loginfo("start initialize joint...")
+            self.init_pos.data = True
+            self.init_pub.publish(self.init_pos)
             eef_home_joint = [-math.pi, -1.211, 1.92553, -0.71161395, math.pi/2, math.pi/2]
             # eef_home_joint = [0.007588, -1.211, 1.92553, -0.71161395, math.pi/2, math.pi/2]
             # eef_home_joint = [0, -1.1123, 1.9444, -math.pi/4, math.pi/2, math.pi/2]
             self.pub_joint_pos(eef_home_joint)
             rospy.loginfo("ee_f_cart_pos %s", self.get_eef_pose())
-            rospy.sleep(1)
+            # rospy.sleep(1)
             self.flag_init_joint=0
             self.contacted = 0
             # self.reset_ft_sensor()
 
+
         elif self.flag_docking ==1:
 
             rospy.loginfo('start docking...')
+            self.init_pos.data = False
+            self.init_pub.publish(self.init_pos)
             while True:
                 twiststamped  = TwistStamped()
                 twiststamped.header.stamp = rospy.Time.now()

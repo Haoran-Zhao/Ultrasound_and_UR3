@@ -28,6 +28,7 @@ if __name__=='__main__':
             data = data.replace(")", "\n")
             data = data.split(" , ")
             ft_data = [float(data[0]), float(data[1]), float(data[2])]
+            # print(repr(ft_data))
             # rospy.loginfo("ft_data: {}".format(ft_data))
             twist.linear.x = ft_data[0]
             twist.linear.y = ft_data[1]
