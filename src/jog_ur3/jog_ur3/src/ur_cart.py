@@ -221,7 +221,7 @@ class UR3CartROS(object):
         step = 0.001
         dif = vel_in - vel_lst
 
-        if dif > step:
+        if np.abs(dif) > step:
             vel_out = vel_lst + step * np.sign(vel_in - vel_lst)
         else:
             vel_out = vel_in
@@ -315,7 +315,7 @@ class UR3CartROS(object):
                 twiststamped.header.stamp = rospy.Time.now()
                 # print ('roll:{},pitch:{},yaw:{}'.format(self.twist.angular.x, self.twist.angular.y, self.twist.angular.y))
                 vel_sm = self.vel_smooth(self.vel_lst, self.twist.linear.x)
-                rospy.loginfo('linear.x_in: {}, linear_x_sm: {}'.format(self.twist.linear.x, vel_sm))
+                # rospy.loginfo('linear.x_in: {}, linear_x_sm: {}'.format(self.twist.linear.x, vel_sm))
                 if self.contacted==1 and (np.abs(self.twist.angular.y) > 3 or np.abs(self.twist.angular.z) > 3):
                     twiststamped.twist.linear.x = vel_sm
 
