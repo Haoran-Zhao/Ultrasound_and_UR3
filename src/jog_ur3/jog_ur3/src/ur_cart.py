@@ -54,7 +54,7 @@ class UR3CartROS(object):
         self.docked_pub = rospy.Publisher('docked_flg', Bool, queue_size=1 )
 
         self.twist_pub = rospy.Publisher('jog_arm_server/delta_jog_cmds', TwistStamped, queue_size=1)
-        self.ft_orien_pub = rospy.Publisher('ft_orien', Twist, queue_size=1)
+        # self.surf_orien_pub = rospy.Publisher('surf_orien', Twist, queue_size=1)
         self.speed_scaling_pub.publish(Float64(0.3))
 
         self.switch_controller_cli = rospy.ServiceProxy('controller_manager/switch_controller', SwitchController)
