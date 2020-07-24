@@ -40,6 +40,9 @@ linear_last_out = 0;
 angular_last_out = 0;
 force_last_out = 0;
 dt = 0.1;
+
+last_ft_msg = 0;
+last_pos_msg=0;
 %% initiliaze trajectory and plot
 
 figure(1)
@@ -127,6 +130,11 @@ while(1)
 
     % sub current position of end effect msg (it's the flange of the ur robot, not the TCP)
     msg = posSub.LatestMessage;
+    
+    if msg == last_pos_msg
+        continue
+    end
+    last_pos_msg = msg;
     cur_X = round(msg.X,4);
     cur_Y = round(msg.Y,4);
     cur_Z = round(msg.Z,4);
@@ -158,7 +166,7 @@ while(1)
         update_p_flag = 0;
         % impedance control
         [disp_X, disp_Y, disp_Z, error_force,force_last_out] = Force_PID(f_vec, ft_vec, 1, 0, 0, error_force, force_last_out, dt);
-        disp([disp_X, disp_Y, disp_Z])
+%         disp([disp_X, disp_Y, disp_Z])
         % positiongin control
         goal_linear_X = Traj(t,1)/1000;%+disp_X; % match frame offset
         goal_linear_Y = Traj(t,2)/1000;%+disp_Y; % match frame offset
@@ -174,18 +182,18 @@ while(1)
             dif_angular_Y = pitch;
             dif_angular_Z = roll;
             dif_RPY = [dif_angular_X, dif_angular_Y, dif_angular_Z];
-            [goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z, error_angular,angular_last_out] = Angular_PID(dif_RPY, 0.5,0,0, error_angular, angular_last_out, dt);
+            [goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z, error_angular,angular_last_out] = Angular_PID(dif_RPY, 0,0,0, error_angular, angular_last_out, dt);
             
             goalMsg.Angular.X=0;
             goalMsg.Angular.Y=0;
             goalMsg.Angular.Z=0;
             
-            fprintf("angular control on, %b", msg_docked.Data)
+%             fprintf("angular control on, %b", msg_docked.Data)
         else
             goalMsg.Angular.X=0;
             goalMsg.Angular.Y=0;
             goalMsg.Angular.Z=0;
-            fprintf("angular control off, %b", msg_docked.Data)
+%             fprintf("angular control off, %b", msg_docked.Data)
 
         end
         
@@ -193,11 +201,11 @@ while(1)
         goalMsg.Linear.Z = scaler(goalMsg.Linear.Z - goalMsg.Angular.Y,1);
         
         vel_in = [goalMsg.Linear.X, goalMsg.Linear.Y, goalMsg.Linear.Z,goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z];
-        [goalMsg.Linear.X, goalMsg.Linear.Y, goalMsg.Linear.Z,goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z]=vel_smooth(vel_last, vel_in, 0.15);
+        [goalMsg.Linear.X, goalMsg.Linear.Y, goalMsg.Linear.Z,goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z]=vel_smooth(vel_last, vel_in, 0.2);
         vel_last = [goalMsg.Linear.X, goalMsg.Linear.Y, goalMsg.Linear.Z,goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z];
         
-        fprintf('Angular_X: %f Angular_Y: %f, Angular_Z: %f \n',goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z);
-        fprintf('linear_X: %f linear_Y: %f, linear_Z: %f \n',goalMsg.Linear.X, goalMsg.Linear.Y, goalMsg.Linear.Z);
+%         fprintf('Angular_X: %f Angular_Y: %f, Angular_Z: %f \n',goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z);
+%         fprintf('linear_X: %f linear_Y: %f, linear_Z: %f \n',goalMsg.Linear.X, goalMsg.Linear.Y, goalMsg.Linear.Z);
 %         disp(norm(goal_linear - cur_linear)*1000)
 
         send(goalPub,goalMsg);
@@ -217,14 +225,6 @@ while(1)
         t = max(1, mod(t+1,122));
 %         t=1;
     end    
-end
-
-function subcallback(~, msg)
-    fprintf('X: %f Y: %f, Z: %f \n',round(msg.X,3)*1000,round(msg.Y,3)*1000,round(msg.Z,3)*1000);
-end
-
-function subcallback1(~, msg)
-    fprintf('msg: %d \n',msg.Data);
 end
 
 function [flag] = check_start(hist_matrix)
@@ -277,7 +277,7 @@ function [rotation_matrix] = rotation_matrix_from_vectors(vec1, vec2)
     b = reshape(vec2 / norm(vec2), [1,3]);
     v = cross(a, b);
     c = dot(a, b);
-    s = norm(v);
+%     s = norm(v);
     kmat = [[0, -v(3), v(2)]; [v(3), 0, -v(1)]; [-v(2), v(1), 0]];
     rotation_matrix = eye(3) + kmat + kmat*kmat  / (1+c);
 end
@@ -354,10 +354,10 @@ function [linear_x, linear_y, linear_z, angular_x, angular_y, angular_z] = vel_s
     angular_z = vel_last(6) + compare_vel(diff(6), step);
 end
 
-function rot = rotation_mtrx(roll, pitch, yaw)
-    Rx =  [1 0 0; 0 cos(roll) -sin(roll); 0 sin(roll) cos(roll)];
-    Ry = [cos(pitch) 0 sin(pitch); 0 1 0; -sin(pitch) 0 cos(pitch)];
-    Rz = [cos(yaw) -sin(yaw) 0; sin(yaw) cos(yaw) 0; 0 0 1];
-    
-    rot = Rx * Ry * Rz;
-end
+% function rot = rotation_mtrx(roll, pitch, yaw)
+%     Rx =  [1 0 0; 0 cos(roll) -sin(roll); 0 sin(roll) cos(roll)];
+%     Ry = [cos(pitch) 0 sin(pitch); 0 1 0; -sin(pitch) 0 cos(pitch)];
+%     Rz = [cos(yaw) -sin(yaw) 0; sin(yaw) cos(yaw) 0; 0 0 1];
+%     
+%     rot = Rx * Ry * Rz;
+% end
