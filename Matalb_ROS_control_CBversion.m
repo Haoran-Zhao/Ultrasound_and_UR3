@@ -15,16 +15,22 @@ global Y_pos;
 global Z_pos;
 global t;
 global update_p_flag;
+global init_plot_flag;
+
 
 X_pos = [];
 Y_pos = [];
 Z_pos = [];
 t = 1;
 update_p_flag = 1;
-
+init_plot_flag = 0;
 global ft_vec;
 ft_vec = [0 0 1];
+
+global v_tool;
 v_tool = [0 0 1]; % desired tool orientation
+
+global f_vec
 f_vec = [0 0 1]; % desired force vector
 
 global vel_last;
@@ -91,6 +97,10 @@ Traj(:,3) = Z(:);
 
 Traj = (R_y*Traj')';
 
+global h0;
+global h1;
+global h2;
+
 figure(1)
 h0=plot3(Traj(:,1),Traj(:,2),Traj(:,3));
 xlabel('x')
@@ -104,11 +114,13 @@ h2 = scatter3(NaN,NaN,NaN,'d');
 
 %% Mian Loop is in posSubCB
 %Creat ROS subscribers and Publishers
-trackSub = rossubscriber('/track_flag', trackSubCB);
-dockedSub = rossubscriber('/docked_flg', dockSubCB);
-initSub = rossubscriber('/init_flg', initSubCB);
-ftSub = rossubscriber('/ft_data', ftSubCB);
-posSub = rossubscriber('/cur_pos', posSubCB);
+initSub = rossubscriber('/init_flg', @initSubCB);
+dockedSub = rossubscriber('/docked_flg', @dockSubCB);
+trackSub = rossubscriber('/track_flag', @trackSubCB);
+ftSub = rossubscriber('/ft_data', @ftSubCB);
+posSub = rossubscriber('/cur_pos', @posSubCB);
+global goalMsg;
+global goalPub;
 [goalPub, goalMsg] = rospublisher('/goal_pos','geometry_msgs/Twist');
 
 %% functions
@@ -116,13 +128,10 @@ function trackSubCB(~, msg)
     % sub tracking start flag msg
     global msg_track_hist;
     global start_track;
-    if ~isempty(msg)
-        msg_track_hist(1,1:4) = msg_track_hist(1,2:5);
-        msg_track_hist(1,5) = msg.Data;
-    else
-        msg_track_hist(1,1:4) = msg_track_hist(1,2:5);
-        msg_track_hist(1,5) = 0; 
-    end
+    
+    msg_track_hist(1,1:4) = msg_track_hist(1,2:5);
+    msg_track_hist(1,5) = msg.Data;
+
     start_flag = check_start(msg_track_hist);
 
     if start_flag ==1
@@ -135,28 +144,14 @@ end
 function dockSubCB(~, msg)
     %sub docked flag
     global docked_flag;
-    if ~isempty(msg)
-        docked_flag = msg.Data;
-    end
+    docked_flag = msg.Data;
 end
 
 function initSubCB(~, msg)
     % sub initialization flag msg
-    global X_pos;
-    global Y_pos;
-    global Z_pos;
-    global t;
-    global start_track;
-    global update_p_flag;
-    
-    if ~isempty(msg) && msg.Data==1
-       fprintf ('initializing....\n')
-       X_pos = [];
-       Y_pos = [];
-       Z_pos = [];
-       t=1;
-       start_track=0;
-       update_p_flag=1;
+    global init_plot_flag;
+    if msg.Data==1
+       init_plot_flag=1;
     end
 
 end
@@ -178,7 +173,7 @@ function posSubCB(~, msg)
     global P_last;
     global center;
     global Traj;
-    global vel_last;
+%     global vel_last;
     global t;
     global error_linear;
     global error_force;
@@ -187,6 +182,27 @@ function posSubCB(~, msg)
     global angular_last_out;
     global force_last_out;
     global dt;
+    global v_tool;
+    global f_vec;
+    global ft_vec;
+    global h0;
+    global h1;
+    global h2;
+    global goalMsg;
+    global goalPub;
+    global docked_flag;
+    global init_plot_flag;
+    
+    if init_plot_flag==1
+       fprintf ('initializing....\n')
+       X_pos = [];
+       Y_pos = [];
+       Z_pos = [];
+       t=1;
+       start_track=0;
+       update_p_flag=1;
+    end
+        
     update_plot = 1;
     % sub current position of end effect msg (it's the flange of the ur robot, not the TCP)
     cur_X = round(msg.X,4);
@@ -238,7 +254,7 @@ function posSubCB(~, msg)
             dif_angular_Y = pitch;
             dif_angular_Z = roll;
             dif_RPY = [dif_angular_X, dif_angular_Y, dif_angular_Z];
-            [goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z, error_angular,angular_last_out] = Angular_PID(dif_RPY, 0.5,0,0, error_angular, angular_last_out, dt);
+            [goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z, error_angular,angular_last_out] = Angular_PID(dif_RPY, 0,0,0, error_angular, angular_last_out, dt);
             
             goalMsg.Angular.X=0;
             goalMsg.Angular.Y=0;
@@ -255,10 +271,10 @@ function posSubCB(~, msg)
         goalMsg.Linear.Y = scaler(goalMsg.Linear.Y + goalMsg.Angular.Z,1);
         goalMsg.Linear.Z = scaler(goalMsg.Linear.Z - goalMsg.Angular.Y,1);
         
-        vel_in = [goalMsg.Linear.X, goalMsg.Linear.Y, goalMsg.Linear.Z,goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z];
-        [goalMsg.Linear.X, goalMsg.Linear.Y, goalMsg.Linear.Z,goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z]=vel_smooth(vel_last, vel_in, 0.15);
-        vel_last = [goalMsg.Linear.X, goalMsg.Linear.Y, goalMsg.Linear.Z,goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z];
-        
+%         vel_in = [goalMsg.Linear.X, goalMsg.Linear.Y, goalMsg.Linear.Z,goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z];
+%         [goalMsg.Linear.X, goalMsg.Linear.Y, goalMsg.Linear.Z,goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z]=vel_smooth(vel_last, vel_in, 0.3);
+%         vel_last = [goalMsg.Linear.X, goalMsg.Linear.Y, goalMsg.Linear.Z,goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z];
+%         
 %         fprintf('Angular_X: %f Angular_Y: %f, Angular_Z: %f \n',goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z);
 %         fprintf('linear_X: %f linear_Y: %f, linear_Z: %f \n',goalMsg.Linear.X, goalMsg.Linear.Y, goalMsg.Linear.Z);
         send(goalPub,goalMsg);
