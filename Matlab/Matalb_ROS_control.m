@@ -24,17 +24,19 @@ Y_pos = [];
 Z_pos = [];
 ft_vec = [0 0 1];
 v_tool = [0 0 1]; % desired tool orientation
-f_vec = [0 0 1]; % desired force vector
+f_vec = [0 0 -5]; % desired force vector
 vel_last = [0 0 0 0 0 0];
 t = 1;
-
+count = 0;
 start_track = 0; % start tracking flag
 docked_flag = 0;
 update_p_flag = 1;
 msg_track_hist = ones(1,5)*2; % trakcing flag history data
+ft_hist = [];
+ft_hist = [ft_hist; ft_vec];
 
 error_linear = [0,0,0]; % positioning integral error for PID controller
-error_force = [0,0,0]; % force integral error for PID controller
+error_force = 0; % force integral error for PID controller
 error_angular = [0,0,0]; % angular integral error for PID controller
 linear_last_out = 0;
 angular_last_out = 0;
@@ -46,6 +48,8 @@ last_pos_msg=0;
 %% initiliaze trajectory and plot
 
 figure(1)
+set(gcf, 'Position', [100,60, 500, 950])
+subplot(2,1,1)
 axis([-150 150 -150 150 -150 150])
 
 r = 30; %[mm]
@@ -83,6 +87,13 @@ hold on
 h1 = scatter3(X_pos,Y_pos,Z_pos);
 h2 = scatter3(NaN,NaN,NaN,'d');
 
+subplot(2,1,2)
+h3 = plot(ft_hist(:,3));
+hold on 
+h4 = plot(smoothdata(ft_hist(:,3),'movmedian',5),'r');
+h5 = plot(1:length(ft_hist), f_vec(3)* ones(length(ft_hist),1), 'g');
+
+
 
 %% Mian Loop
 while(1)
@@ -115,6 +126,7 @@ while(1)
        X_pos = [];
        Y_pos = [];
        Z_pos = [];
+       ft_hist = [];
        t=1;
        start_track=0;
        update_p_flag=1;
@@ -123,9 +135,11 @@ while(1)
     
     % sub ft sensor data msg
     msg_ft = ftSub.LatestMessage;
-    ft_vec(1) = round(msg_ft.Linear.X, 0);
-    ft_vec(2) = round(msg_ft.Linear.Y, 0);
-    ft_vec(3) = round(msg_ft.Linear.Z, 0);
+    ft_vec(1) = round(msg_ft.Linear.X, 1);
+    ft_vec(2) = round(msg_ft.Linear.Y, 1);
+    ft_vec(3) = round(msg_ft.Linear.Z, 1);
+    
+    ft_hist = [ft_hist; ft_vec];
     
 
     % sub current position of end effect msg (it's the flange of the ur robot, not the TCP)
@@ -165,43 +179,24 @@ while(1)
     if start_track==1 && ~isempty(X_pos)
         update_p_flag = 0;
         % impedance control
-        [disp_X, disp_Y, disp_Z, error_force,force_last_out] = Force_PID(f_vec, ft_vec, 1, 0, 0, error_force, force_last_out, dt);
+        [linear_fX, error_force,force_last_out] = Force_PID(f_vec, ft_vec, 0.05, 0.005, 0, error_force, force_last_out, dt);
 %         disp([disp_X, disp_Y, disp_Z])
         % positiongin control
-        goal_linear_X = Traj(t,1)/1000;%+disp_X; % match frame offset
-        goal_linear_Y = Traj(t,2)/1000;%+disp_Y; % match frame offset
-        goal_linear_Z = Traj(t,3)/1000;%+disp_Z; % match frame offset
+        goal_linear_X = Traj(t,1)/1000; 
+        goal_linear_Y = Traj(t,2)/1000;
+        goal_linear_Z = Traj(t,3)/1000;
         goal_linear = [goal_linear_X, goal_linear_Y, goal_linear_Z];
         
         [goalMsg.Linear.X, goalMsg.Linear.Y, goalMsg.Linear.Z,error_linear,linear_last_out] = Linear_PID(goal_linear, cur_linear, 2, 0, 0.01, error_linear, linear_last_out, dt);
-        
-        % orientation alignment control
-        if docked_flag ==1
-            [roll, pitch, yaw] = orien_align(ft_vec, v_tool');
-            dif_angular_X = 0;
-            dif_angular_Y = pitch;
-            dif_angular_Z = roll;
-            dif_RPY = [dif_angular_X, dif_angular_Y, dif_angular_Z];
-            [goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z, error_angular,angular_last_out] = Angular_PID(dif_RPY, 0,0,0, error_angular, angular_last_out, dt);
-            
-            goalMsg.Angular.X=0;
-            goalMsg.Angular.Y=0;
-            goalMsg.Angular.Z=0;
-            
-%             fprintf("angular control on, %b", msg_docked.Data)
-        else
-            goalMsg.Angular.X=0;
-            goalMsg.Angular.Y=0;
-            goalMsg.Angular.Z=0;
-%             fprintf("angular control off, %b", msg_docked.Data)
+        goalMsg.Linear.X = linear_fX;
+        fprintf('goal_linear_x: %f, linear_fx: %f\n', goalMsg.Linear.X, linear_fX);
 
-        end
-        
-        goalMsg.Linear.Y = scaler(goalMsg.Linear.Y + goalMsg.Angular.Z,1);
-        goalMsg.Linear.Z = scaler(goalMsg.Linear.Z - goalMsg.Angular.Y,1);
+        goalMsg.Angular.X=0;
+        goalMsg.Angular.Y=0;
+        goalMsg.Angular.Z=0;
         
         vel_in = [goalMsg.Linear.X, goalMsg.Linear.Y, goalMsg.Linear.Z,goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z];
-        [goalMsg.Linear.X, goalMsg.Linear.Y, goalMsg.Linear.Z,goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z]=vel_smooth(vel_last, vel_in, 0.2);
+%         [goalMsg.Linear.X, goalMsg.Linear.Y, goalMsg.Linear.Z,goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z]=vel_smooth(vel_last, vel_in, 0.25);
         vel_last = [goalMsg.Linear.X, goalMsg.Linear.Y, goalMsg.Linear.Z,goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z];
         
 %         fprintf('Angular_X: %f Angular_Y: %f, Angular_Z: %f \n',goalMsg.Angular.X, goalMsg.Angular.Y, goalMsg.Angular.Z);
@@ -216,13 +211,19 @@ while(1)
     set(h1, 'XData', (X_pos-center(1))*1000, 'YData', (Y_pos-center(2))*1000, 'ZData', (Z_pos-center(3))*1000, 'cData', jet(length(X_pos)));
     set(h2, 'XData', (Traj(t,1)/1000-center(1))*1000, 'YData', (Traj(t,2)/1000-center(2))*1000, 'ZData', (Traj(t,3)/1000-center(3))*1000);
     set(h0, 'XData',(Traj(:,1)/1000-center(1))*1000,'YData', (Traj(:,2)/1000-center(2))*1000,'ZData',(Traj(:,3)/1000-center(3))*1000);
+    set(h3, 'XData', 1:length(ft_hist) ,'YData', ft_hist(:,3));
+    set(h4, 'XData', 1:length(ft_hist) ,'YData', smoothdata(ft_hist(:,3),'movmedian',20));
+    set(h5, 'XData', 1:length(ft_hist) ,'YData',  f_vec(3)* ones(length(ft_hist),1));
+
     drawnow
     end
     
+    count = count +1;
     
     % update goal watpoint
-    if start_track == 1 && norm(goal_linear - cur_linear)*1000 < 1.5
+    if start_track == 1 && mod(count, 7)==0 
         t = max(1, mod(t+1,122));
+        count = 0;
 %         t=1;
     end    
 end
@@ -250,10 +251,10 @@ end
 
 function [output] = scaler(input, weight)
 % scale the output in range of [-1, 1]
-    input = input * weight;
+    input = round(input,3) * weight;
     if input >= 1
         output =1;
-    elseif 0<= input && input <=0.05
+    elseif 0< input && input <=0.05
         output = 0.05;
     elseif input < 0 && input >= -0.05
         output = -0.05;
@@ -303,11 +304,12 @@ end
 function [linear_X, linear_Y, linear_Z, error_out,last_out] = Linear_PID(goal, cur, Kp, Ki, Kd, error_in, last_in, dt)
     % error_* is the integral historical error
     e = goal - cur; % difference between goal and current value
+    e(1)=0;
     error_out = error_in + e .*1000 .* dt; % update integral historical error
     last_out = e;
     output = Kp .* e .*1000 + Ki.* error_out - Kd/dt .* (e - last_in).*1000; %PID controller
     
-    linear_X = scaler(output(1), 0.1);
+    linear_X = 0; %scaler(output(1), 0.1);
     linear_Y = scaler(output(2), 0.1);
     linear_Z = scaler(output(3), 0.1);
     
@@ -325,15 +327,13 @@ function [angular_X, angular_Y, angular_Z, error_out,last_out] = Angular_PID(dif
     angular_Z = scaler(output(3), 0.1);   
 end
 
-function [disp_X, disp_Y, disp_Z, error_out,last_out] = Force_PID(goal_force, cur_force, Kp, Ki, Kd, error_in, last_in, dt)
-    stf_factor = [35e6, 35e6, 30e6]; %N/m
-    e = goal_force - floor(cur_force);
+function [linear_fX, error_out,last_out] = Force_PID(goal_force, cur_force, Kp, Ki, Kd, error_in, last_in, dt)
+%     stf_factor = [35e4, 35e4, 30e4]; %N/m
+    e = goal_force(3) - cur_force(3);
     error_out = error_in + e;
     last_out = e;
-    output = Kp .* e ./ stf_factor + Ki.* error_out./stf_factor - Kd/dt .* (e - last_in)./stf_factor; %PID controller
-    disp_X = output(1) * 1000;
-    disp_Y = output(2) * 1000;
-    disp_Z = output(3) * 1000;
+    output = Kp .* e  + Ki.* error_out - Kd/dt .* (e - last_in); %PID controller
+    linear_fX = scaler(output(1),1);
 end
 
 function [out] = compare_vel(diff, step)
@@ -349,9 +349,9 @@ function [linear_x, linear_y, linear_z, angular_x, angular_y, angular_z] = vel_s
     linear_x = vel_last(1) + compare_vel(diff(1), step);
     linear_y = vel_last(2) + compare_vel(diff(2), step);
     linear_z = vel_last(3) + compare_vel(diff(3), step);
-    angular_x = vel_last(4) + compare_vel(diff(4), step);
-    angular_y = vel_last(5) + compare_vel(diff(5), step);
-    angular_z = vel_last(6) + compare_vel(diff(6), step);
+    angular_x = 0;
+    angular_y = 0;
+    angular_z = 0;
 end
 
 % function rot = rotation_mtrx(roll, pitch, yaw)
