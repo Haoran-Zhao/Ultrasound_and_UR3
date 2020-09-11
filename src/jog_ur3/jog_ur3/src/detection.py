@@ -275,9 +275,7 @@ class ultrasound_detection:
         cv2.imshow("KNN_csrt", KNN_csrt)  # KNN_csrt
 
         key = cv2.waitKey(1)
-        if key & 0xFF == ord('q'):
-            cv2.destroyAllWindows()
-            cap.release()
+
         if key == ord('p'):
             if not self.initBB:
                 self.initBB = cv2.selectROI('KNN_csrt', KNN_csrt, fromCenter=False,

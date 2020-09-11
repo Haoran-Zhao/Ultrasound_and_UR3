@@ -6,12 +6,12 @@
 },
 {
   "directory": "/home/haoran/UR_ws/build/jog_ur3/jog_ur3",
-  "command": "/usr/bin/c++  -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"jog_ur3\\\" -I/home/haoran/UR_ws/src/jog_ur3/jog_ur3/include -I/home/haoran/UR_ws/devel/include -I/opt/ros/melodic/include -I/opt/ros/melodic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/opt/ros/melodic/share/orocos_kdl/cmake/../../../include -I/usr/include/eigen3    -std=c++11 -o CMakeFiles/jog_arm_server.dir/src/jog_arm_server.cpp.o -c /home/haoran/UR_ws/src/jog_ur3/jog_ur3/src/jog_arm_server.cpp",
-  "file": "/home/haoran/UR_ws/src/jog_ur3/jog_ur3/src/jog_arm_server.cpp"
+  "command": "/usr/bin/c++  -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"jog_ur3\\\" -I/home/haoran/UR_ws/src/jog_ur3/jog_ur3/include -I/home/haoran/UR_ws/devel/include -I/opt/ros/melodic/include -I/opt/ros/melodic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/opt/ros/melodic/share/orocos_kdl/cmake/../../../include -I/usr/include/eigen3    -std=c++11 -o CMakeFiles/xbox_to_twist.dir/src/xbox_to_twist.cpp.o -c /home/haoran/UR_ws/src/jog_ur3/jog_ur3/src/xbox_to_twist.cpp",
+  "file": "/home/haoran/UR_ws/src/jog_ur3/jog_ur3/src/xbox_to_twist.cpp"
 },
 {
   "directory": "/home/haoran/UR_ws/build/jog_ur3/jog_ur3",
-  "command": "/usr/bin/c++  -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"jog_ur3\\\" -I/home/haoran/UR_ws/src/jog_ur3/jog_ur3/include -I/home/haoran/UR_ws/devel/include -I/opt/ros/melodic/include -I/opt/ros/melodic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/opt/ros/melodic/share/orocos_kdl/cmake/../../../include -I/usr/include/eigen3    -std=c++11 -o CMakeFiles/xbox_to_twist.dir/src/xbox_to_twist.cpp.o -c /home/haoran/UR_ws/src/jog_ur3/jog_ur3/src/xbox_to_twist.cpp",
-  "file": "/home/haoran/UR_ws/src/jog_ur3/jog_ur3/src/xbox_to_twist.cpp"
+  "command": "/usr/bin/c++  -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"jog_ur3\\\" -I/home/haoran/UR_ws/src/jog_ur3/jog_ur3/include -I/home/haoran/UR_ws/devel/include -I/opt/ros/melodic/include -I/opt/ros/melodic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/opt/ros/melodic/share/orocos_kdl/cmake/../../../include -I/usr/include/eigen3    -std=c++11 -o CMakeFiles/jog_arm_server.dir/src/jog_arm_server.cpp.o -c /home/haoran/UR_ws/src/jog_ur3/jog_ur3/src/jog_arm_server.cpp",
+  "file": "/home/haoran/UR_ws/src/jog_ur3/jog_ur3/src/jog_arm_server.cpp"
 }
 ]

@@ -13,7 +13,7 @@ class video_publisher():
         self.bridge = CvBridge()
 
     def main(self):
-        cap = cv2.VideoCapture('/home/haoran/UR_ws/src/jog_ur3/jog_ur3/video/gel_pad.avi')
+        cap = cv2.VideoCapture('/home/haoran/Desktop/video/gel_pad.avi')
 
         while cap.isOpened():
             ret, current_frame = cap.read()

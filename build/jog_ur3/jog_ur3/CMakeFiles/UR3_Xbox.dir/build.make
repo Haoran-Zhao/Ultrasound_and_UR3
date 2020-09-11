@@ -94,6 +94,7 @@ UR3_Xbox_EXTERNAL_OBJECTS =
 /home/haoran/UR_ws/devel/lib/jog_ur3/UR3_Xbox: /opt/ros/melodic/lib/libmoveit_planning_scene_interface.so
 /home/haoran/UR_ws/devel/lib/jog_ur3/UR3_Xbox: /opt/ros/melodic/lib/libmoveit_move_group_interface.so
 /home/haoran/UR_ws/devel/lib/jog_ur3/UR3_Xbox: /opt/ros/melodic/lib/libmoveit_py_bindings_tools.so
+/home/haoran/UR_ws/devel/lib/jog_ur3/UR3_Xbox: /opt/ros/melodic/lib/libmoveit_cpp.so
 /home/haoran/UR_ws/devel/lib/jog_ur3/UR3_Xbox: /opt/ros/melodic/lib/libmoveit_warehouse.so
 /home/haoran/UR_ws/devel/lib/jog_ur3/UR3_Xbox: /opt/ros/melodic/lib/libwarehouse_ros.so
 /home/haoran/UR_ws/devel/lib/jog_ur3/UR3_Xbox: /opt/ros/melodic/lib/libmoveit_pick_place_planner.so
@@ -139,9 +140,9 @@ UR3_Xbox_EXTERNAL_OBJECTS =
 /home/haoran/UR_ws/devel/lib/jog_ur3/UR3_Xbox: /usr/lib/x86_64-linux-gnu/liburdfdom_model_state.so
 /home/haoran/UR_ws/devel/lib/jog_ur3/UR3_Xbox: /usr/lib/x86_64-linux-gnu/liburdfdom_model.so
 /home/haoran/UR_ws/devel/lib/jog_ur3/UR3_Xbox: /usr/lib/x86_64-linux-gnu/liburdfdom_world.so
-/home/haoran/UR_ws/devel/lib/jog_ur3/UR3_Xbox: /usr/lib/x86_64-linux-gnu/libtinyxml.so
 /home/haoran/UR_ws/devel/lib/jog_ur3/UR3_Xbox: /opt/ros/melodic/lib/librosconsole_bridge.so
 /home/haoran/UR_ws/devel/lib/jog_ur3/UR3_Xbox: /opt/ros/melodic/lib/libsrdfdom.so
+/home/haoran/UR_ws/devel/lib/jog_ur3/UR3_Xbox: /usr/lib/x86_64-linux-gnu/libtinyxml.so
 /home/haoran/UR_ws/devel/lib/jog_ur3/UR3_Xbox: /opt/ros/melodic/lib/libgeometric_shapes.so
 /home/haoran/UR_ws/devel/lib/jog_ur3/UR3_Xbox: /opt/ros/melodic/lib/liboctomap.so
 /home/haoran/UR_ws/devel/lib/jog_ur3/UR3_Xbox: /opt/ros/melodic/lib/liboctomath.so
