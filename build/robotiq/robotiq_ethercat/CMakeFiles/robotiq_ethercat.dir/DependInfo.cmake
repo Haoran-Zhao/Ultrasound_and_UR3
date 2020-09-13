@@ -18,9 +18,10 @@ set(CMAKE_TARGET_DEFINITIONS_CXX
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "/home/haoran/UR_ws/src/robotiq/robotiq_ethercat/include"
-  "/opt/ros/melodic/include/soem"
   "/opt/ros/melodic/include"
+  "/opt/ros/melodic/include/soem"
   "/opt/ros/melodic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp"
+  "/opt/ros/melodic/include/soem/soem"
   )
 
 # Targets to which this target links.

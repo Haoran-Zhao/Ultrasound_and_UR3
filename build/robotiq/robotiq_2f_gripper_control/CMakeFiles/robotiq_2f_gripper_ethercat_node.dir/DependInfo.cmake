@@ -21,8 +21,8 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "/home/haoran/UR_ws/devel/include"
   "/home/haoran/UR_ws/src/robotiq/robotiq_2f_gripper_control/include"
   "/home/haoran/UR_ws/src/robotiq/robotiq_ethercat/include"
-  "/opt/ros/melodic/include/soem"
   "/opt/ros/melodic/include"
+  "/opt/ros/melodic/include/soem"
   "/opt/ros/melodic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp"
   )
 
