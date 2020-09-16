@@ -12,7 +12,7 @@ class ultrasound_detection:
     def __init__(self):
         rospy.init_node("ultrasound_detection", anonymous=False)
         self.bridge = cv_bridge.CvBridge()
-        self.image_sub = rospy.Subscriber('VideoRaw', Image, self.imageCB)
+        self.image_sub = rospy.Subscriber('FrameRaw', Image, self.imageCB)
         self.xy_pub = rospy.Publisher('cur_xy', Float64MultiArray, queue_size=1)
 
         # initialize the bounding box coordinate of the object we are going to track

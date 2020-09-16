@@ -4,7 +4,7 @@
       <param name="frame_id" type="str" value="robotiq_ft_frame_id" />
       <param name="serial_id" type="str" value="ttyUSB0" />
   </node> -->
-  <node name="VideoPublisher" pkg="jog_ur3" type="videoPublisher.py" output="screen" />
+  <!-- <node name="VideoPublisher" pkg="jog_ur3" type="videoPublisher.py" output="screen" /> -->
   <node name="ultrasound_detection" pkg="jog_ur3" type="detection.py" output="screen" />
 
 </launch>

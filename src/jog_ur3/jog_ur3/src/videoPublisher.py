@@ -9,7 +9,7 @@ from cv_bridge import CvBridge
 class video_publisher():
     def __init__(self):
         rospy.init_node('VideoPublisher', anonymous=True)
-        self.VideoRaw = rospy.Publisher('VideoRaw', Image, queue_size=1)
+        self.VideoRaw = rospy.Publisher('FrameRaw', Image, queue_size=1)
         self.bridge = CvBridge()
 
     def main(self):
