@@ -13,4 +13,11 @@ while(1)
     ft_vec(2) = round(msg_ft.Linear.Y, 1);
     ft_vec(3) = round(msg_ft.Linear.Z, 1);
     disp(ft_vec(3));
+    
+    filename = ['C:/Users/zhaoh/OneDrive/Desktop/Vantage-4.2.0-2001220500/Verasonics_training/Images/scene',num2str(iter),'.png'];
+    if isfile(filename)
+        image = imread(filename);
+        imshow(image);
+        iter = iter + 1;
+    end
 end
