@@ -23,12 +23,16 @@ while(1)
         filename = [directory,'/',imagename];
 %         filename = ['C:\Users\Julien Leclerc\Documents\Vantage-4.1.1-1910101200/Verasonics_Haoran/Images/scene2913.png'];
         if isfile(filename)
-            image = imread(filename);
-%             imshow(image);
-            frameMsg.Encoding = 'mono8';
-            writeImage(frameMsg,image);
-            send(framePub, frameMsg);
-%             iter = iter + 1;
+            try
+                image = imread(filename);
+                %             imshow(image);
+                frameMsg.Encoding = 'mono8';
+                writeImage(frameMsg,image);
+                send(framePub, frameMsg);
+    %             iter = iter + 1;
+            catch ME
+                fprintf('There was a problem reading file %s\n', imagename);
+            end
         end
     end
 end
