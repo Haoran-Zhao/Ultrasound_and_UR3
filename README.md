@@ -54,6 +54,9 @@ gedit .bashrc
 ```
 if pc is not connected to ethernet, comment out last two line of .basrc file. 
 
+##### 2.4 ROS and Labview network setting
+https://sites.google.com/site/rosforlabview/
+
 #### 3. Jog Arm
 Jog arm are from the repository [`Tokyo Opensource Robotics Kyokai Association
 `](https://github.com/tork-a)
