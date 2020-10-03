@@ -239,12 +239,12 @@ class UR3CartROS(object):
         # print('contacted force: {}'.format(np.linalg.norm(self.ft_data)))
         if self.flag_docking ==1 and (self.ft_data[0] > 1 or self.ft_data[1] > 1 or self.ft_data[2] > 1):
             self.contacted =1
-            if ft_norm > 2.5:
+            if ft_norm > 6:
                 rospy.loginfo('ft_z:{}'.format(ft_norm))
-                vel = 0.3 if (ft_norm-2.5) >0.3 else max(np.abs(ft_norm-2.5), 0.1)
+                vel = 0.3 if (ft_norm-5) >0.3 else max(np.abs(ft_norm-5), 0.1)
 
-            elif ft_norm < 1.5:
-                vel = -0.3 if (1.5-ft_norm) >0.3 else -max((1.5-ft_norm), 0.1)
+            elif ft_norm < 4:
+                vel = -0.3 if (3-ft_norm) >0.3 else -max((3-ft_norm), 0.1)
             else:
                 vel = 0.0
 
@@ -253,7 +253,12 @@ class UR3CartROS(object):
             self.twist.linear.z = 0
 
             # roll angular_z pitch angular_y yaw angular_x
-            roll, pitch, yaw = self.orien_align(self.ft_data, self.orien_goal)
+            cur_orien = [0.0, 0.0, 0.0]
+            cur_orien[0] = self.ft_data[0] if self.ft_data[0] >=1 else 0.0
+            cur_orien[1] = self.ft_data[1] if self.ft_data[1] >=1 else 0.0
+            cur_orien[2] = self.ft_data[2]
+
+            roll, pitch, yaw = self.orien_align(cur_orien, self.orien_goal)
             roll = roll*180/math.pi
             pitch = pitch*180/math.pi
             yaw = yaw*180/math.pi
@@ -294,7 +299,7 @@ class UR3CartROS(object):
             self.init_pub.publish(self.init_pos)
             self.docked.data = False
             self.docked_pub.publish(self.docked)
-            eef_home_joint = [0, -0.65*math.pi, -0.43*math.pi, 0.09*math.pi, math.pi/2, math.pi*1.5]
+            eef_home_joint = [0, -0.61*math.pi, -0.51*math.pi, 0.1366*math.pi, math.pi/2, math.pi*1.5]
             # eef_home_joint = [-math.pi, -1.211, 1.92553, -0.71161395, math.pi/2, math.pi/2]
             # eef_home_joint = [0.007588, -1.211, 1.92553, -0.71161395, math.pi/2, math.pi/2]
             # eef_home_joint = [0, -1.1123, 1.9444, -math.pi/4, math.pi/2, math.pi/2]
@@ -310,6 +315,7 @@ class UR3CartROS(object):
 
             rospy.loginfo('start docking...')
             self.init_pos.data = False
+            f_hist = []
             self.init_pub.publish(self.init_pos)
             while True:
                 twiststamped  = TwistStamped()
@@ -341,8 +347,14 @@ class UR3CartROS(object):
                 self.twist_pub.publish(twiststamped)
                 self.vel_lst = twiststamped.twist.linear.x
 
-                if self.contacted==1 and np.abs(self.twist.angular.y) <= 5 and np.abs(self.twist.angular.z) <= 5 and 1.5 <= np.abs(self.ft_data[2]) and np.abs(self.ft_data[2]) <=2.5:
-                    break
+                if self.contacted==1 and np.abs(self.twist.angular.y) <= 5 and np.abs(self.twist.angular.z) <= 5 and 3 <= np.abs(self.ft_data[2]) and np.abs(self.ft_data[2]) <=5:
+                    f_hist.append(np.abs(self.ft_data[2]))
+                    rospy.loginfo("f_hist:{}".format(f_hist))
+                    if len(f_hist) ==5:
+                        if all(f>=3 for f in f_hist):
+                            break
+                        else:
+                            f_hist=[]
             twiststamped.twist.linear.x = 0.0
             twiststamped.twist.linear.y = 0.0
             twiststamped.twist.linear.z = 0.0

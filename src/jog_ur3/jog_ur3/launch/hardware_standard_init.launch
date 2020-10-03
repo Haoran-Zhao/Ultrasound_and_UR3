@@ -3,7 +3,7 @@
   <arg name="debug" default="false" />
   <!-- Connect to the UR3 -->
   <include file="$(find ur_robot_driver)/launch/ur3_bringup.launch">
-    <arg name="robot_ip" default="192.168.1.4"/>
+    <arg name="robot_ip" default="192.168.1.5"/>
     <arg name="limited" default="False"/>
     <arg name="kinematics_config" default="$(find ur_calibration)/my_robot_calibration.yaml"/>
   </include>

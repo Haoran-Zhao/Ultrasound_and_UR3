@@ -10,7 +10,7 @@ from geometry_msgs.msg import Point, Twist
 if __name__=='__main__':
     rospy.init_node('tf_listener')
     ft_pub = rospy.Publisher('ft_data', Twist, queue_size=1)
-    HOST = '192.168.1.4'
+    HOST = '192.168.1.5'
     PORT = 63351
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
