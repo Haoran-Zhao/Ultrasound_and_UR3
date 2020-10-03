@@ -21,16 +21,16 @@
 % Last update:
 % 06/19/2018 - Modified for Vantage 32LE
 
-clear all
+clear
 
 P(1).iter=1;
 P(1).record = 0;
 P(1).scan = [];
 % P(1) is used for Bmode, P(2) is used for Doppler
 P(1).startDepth = 5;   % Acquisition depth in wavelengths
-P(1).endDepth = 128;   % This should preferrably be a multiple of 128 samples.
+P(1).endDepth = 160;   % This should preferrably be a multiple of 128 samples.
 P(2).startDepth = 5;   % Acquisition depth in wavelengths
-P(2).endDepth = 128;   % This should preferrably be a multiple of 128 samples.
+P(2).endDepth = 160;   % This should preferrably be a multiple of 128 samples.
 
 % Set 2D parameters
  % set dtheta2D to range over +/- 15 degrees.
@@ -44,7 +44,7 @@ else
 end
 
 % Set Doppler parameters
-ne = 14;     % Set ne = number of acquisitions in Doppler ensemble.
+ne = 10;     % Set ne = number of acquisitions in Doppler ensemble.
 dopAngle = 12 * pi/180;
 dopPRF = 3.0e+03; % Doppler PRF in Hz.
 pwrThres = 0.17;
@@ -73,7 +73,7 @@ Trans = computeUTAMux64(Trans); % add the HVMux structure for UTA module
 P(1).mm2wl = Trans.frequency/(Resource.Parameters.speedOfSound/1000);
 P(1).wl2mm = Resource.Parameters.speedOfSound/1000/Trans.frequency;
 
-P(1).theta = -pi/6;
+P(1).theta = -pi/8;
 P(1).rayDelta = 2*(-P(1).theta);
 P(1).aperture = 64*Trans.spacing; % P(1).aperture in wavelengths
 P(1).radius = (P(1).aperture/2)/tan(-P(1).theta); % dist. to virt. apex
@@ -85,7 +85,7 @@ P(2).radius = (P(2).aperture/2)/tan(-P(1).theta); % dist. to virt. apex
 
 % Specify PData structure arrays.
 % - 2D PData structure
-PData(1).PDelta = [1, 0, 0.5];
+PData(1).PDelta = [0.8, 0, 0.5];
 PData(1).Size(1) = 10 + ceil((P(1).endDepth-P(1).startDepth)/PData(1).PDelta(3)); % rows
 PData(1).Size(2) = 10 + ceil(2*(P(1).endDepth + P(1).radius)*sin(-P(1).theta)/PData(1).PDelta(1)); % cols
 PData(1).Size(3) = 1;             % single image page
@@ -99,7 +99,7 @@ PData(1).Region = struct(...
             'steer',0));
         
 % - Doppler PData structure
-PData(2).PDelta = [1, 0, 0.5];
+PData(2).PDelta = [0.8, 0, 0.5];
 PData(2).Size(1) = 10 + ceil((P(2).endDepth-P(2).startDepth)/PData(2).PDelta(3)); % flow window rows
 PData(2).Size(2) = 10 + ceil(2*(P(2).endDepth + P(2).radius)*sin(-P(2).theta)/PData(2).PDelta(1));  % flow window columns
 PData(2).Size(3) = 1;             % single image page
@@ -576,17 +576,17 @@ P = evalin('base','P');
 %     myHandle1 = axes('XLim', [0,size(RData,2)], 'YLim', [0, size(RData,1)],...
 %     'Ydir','reverse','NextPlot', 'replacechildren');
 % end
-% P = evalin('base','P');
-% P(1).scan = RData;
-% assignin('base','P', P);
+P = evalin('base','P');
+P(1).scan = RData;
+assignin('base','P', P);
 gray_img = mat2gray(RData);
 gray_img = imresize(gray_img, [500 NaN]);
 % imagesc(myHandle1,gray_img);
 % colormap(gray(256))
 % title(myHandle, sprintf('Pxl2mm = %0.3f',P.pxl2mm))
-if P(1).record
-    imwrite(gray_img, [pwd '/Verasonics_Haoran/Images/Scan/scene',num2str(P(1).iter),'.png']);
-end
+% if P(1).record
+%     imwrite(gray_img, [pwd '/Verasonics_Haoran/Images/Scan/scene',num2str(P(1).iter),'.png']);
+% end
 % keyboard % debug
 % ImgDisplay = get(Resource.DisplayWindow(1).imageHandle,'CData');
 % imagesc(ImgDisplay);
@@ -599,9 +599,19 @@ end
 myProcFunction2(RData)
 persistent myHandle2
 P = evalin('base','P');
+scan_img = P(1).scan;
+scan_gray = mat2gray(scan_img);
 gray_img = mat2gray(RData);
+gray_img = scan_gray + gray_img;
+gray_img = imadjust(gray_img);
+gray_img = medfilt2(gray_img);
 thL = mode(gray_img(:));
+if thL <=0.05
+    thL = 0.05;
+end
 gray_img(gray_img(:) <= thL) =0; 
+% sharpCoeff = [0 0 0;0 1 0;0 0 0]-fspecial('laplacian',0.2);
+% gray_img = imfilter(gray_img,sharpCoeff,'symmetric');
 gray_img = imresize(gray_img, [500 NaN]);
 % Resource = evalin('base','Resource');
 if isempty(myHandle2)||~ishandle(myHandle2)
@@ -620,10 +630,14 @@ caxis([0 1]);
 % ImgDisplay = get(Resource.DisplayWindow(1).imageHandle,'CData');
 % imagesc(ImgDisplay);
 % colormap(gray);
-% caxis([0 256]);
+caxis([0 1]);
 % 
 if P(1).record
-    imwrite(gray_img, [pwd '/Verasonics_Haoran/Images/Doppler/doppler',num2str(P(1).iter),'.png']);
+    % color img save
+%     img = getframe(myHandle2);
+%     imwrite(img.cdata, [pwd '/Verasonics_Haoran/Images/Doppler/doppler',num2str(P(1).iter),'.png']);
+    % gray img save
+    imwrite(gray_img, [pwd '/Verasonics_Haoran/Images/scene',num2str(P(1).iter),'.png']);
     P(1).iter = P(1).iter+1;
     assignin('base','P', P);
 end
