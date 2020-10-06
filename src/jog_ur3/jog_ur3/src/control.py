@@ -47,7 +47,9 @@ class UR3_control(object):
         self.track_msg_hist[4] = msg.data
 
         start_flg = self.check_start(self.track_msg_hist);
-        self.track_flg = start_flg
+
+        self.track_flg = start_flg if start_flg!=-1 else self.track_flg
+        print(self.track_flg)
 
     def init_CB(self, msg):
         self.init_flg = msg.data
@@ -81,6 +83,8 @@ class UR3_control(object):
             return 0;
         elif count_start ==n:
             return 1;
+        else:
+            return -1;
 
 
     def rotation_matrix_from_vectors(self, vec1, vec2):
