@@ -40,7 +40,7 @@ private:
     ft_twist_.angular.y = msg->angular.y;
     ft_twist_.angular.z = msg->angular.z;
   }
-  
+
 
   // Convert incoming joy commands to TwistStamped commands for jogging
   void joyCallback(const sensor_msgs::Joy::ConstPtr& msg)

@@ -8,9 +8,10 @@
 
   <node name="initial_node_ur_cart" pkg="jog_ur3" type="ur_cart.py" output="screen" />
   <node name="tf_test" pkg="jog_ur3" type="tf_test.py" output="screen" />
-  <node name="ultrasound_detection" pkg="jog_ur3" type="detection.py" output="screen" />
+  <node name="ultrasound_detection" pkg="jog_ur3" type="channel_detection.py" output="screen" />
 
   <node name="ur3_Xbox" pkg="jog_ur3" type="UR3_Xbox" output="screen" />
+  <node name="UR3Control" pkg="jog_ur3" type="control.py" output="screen" />
 
   <node name="jog_arm_server" pkg="jog_ur3" type="jog_arm_server" output="screen" >
     <param name="parameter_ns" type="string" value="jog_arm_server" />
