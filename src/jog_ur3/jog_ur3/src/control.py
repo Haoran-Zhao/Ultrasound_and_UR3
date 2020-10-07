@@ -30,8 +30,8 @@ class UR3_control(object):
 
         self.cur_pos = np.zeros((3), dtype = float)
         self.Image_ctrl_pixl = np.zeros((2), dtype = float)
-        self.Image_ctrl_pixl[0] = 250
-        self.Image_ctrl_pixl[1] = 159
+        self.Image_ctrl_pixl[0] = 159
+        self.Image_ctrl_pixl[1] = 250
         self.dt = 0.1
         self.track_msg_hist = np.ones((5), dtype = int)*2
         self.error_force_acc = np.zeros((3), dtype = float)
@@ -49,14 +49,17 @@ class UR3_control(object):
         start_flg = self.check_start(self.track_msg_hist);
 
         self.track_flg = start_flg if start_flg!=-1 else self.track_flg
-        print(self.track_flg)
 
     def init_CB(self, msg):
         self.init_flg = msg.data
 
     def Image_xy_CB(self, msg):
-        self.target_vec[0] = (msg.data[0] - self.Image_ctrl_pixl[0]) * self.pixl2mm
-        self.target_vec[1] = (msg.data[1]- self.Image_ctrl_pixl[1]) * self.pixl2mm
+        if msg.data != (0, 0):
+            self.target_vec[0] = (msg.data[0] - self.Image_ctrl_pixl[0]) * self.pixl2mm
+            self.target_vec[1] = (msg.data[1]- self.Image_ctrl_pixl[1]) * self.pixl2mm
+        else:
+            self.target_vec = np.zeros((2), dtype=float)
+
 
     def ft_CB(self, msg):
         self.ft_vec[0] = np.round(msg.linear.x,1)
@@ -80,8 +83,10 @@ class UR3_control(object):
             elif hist[i] == 2:
                 count_halt +=1
         if count_halt==n:
+            rospy.loginfo('stop tracking...')
             return 0;
         elif count_start ==n:
+            rospy.loginfo('start tracking...')
             return 1;
         else:
             return -1;
@@ -152,10 +157,9 @@ class UR3_control(object):
         error_out = error_in + e * dt; # update integral historical error
         last_out = e;
         output = Kp * e + Ki * error_out - Kd/dt * (e - last_in); #PID controller
-
         linear_X = 0; # scaler(output[0], 0.1);
-        linear_Y = self.scaler(output[0], 0.1);
-        linear_Z = self.scaler(output[1], 0.1);
+        linear_Y = -self.scaler(output[0], 0.1);
+        linear_Z = 0; # self.scaler(output[1], 0.1);
 
         return linear_X, linear_Y, linear_Z, error_out,last_out
 
@@ -200,8 +204,15 @@ class UR3_control(object):
             [linear_fX, self.error_force_acc ,self.last_error_force] = self.Force_PID(self.force_goal, self.ft_vec, 0, 0, 0, self.error_force_acc, self.last_error_force, self.dt)#0.05, 0.005
 
             goalMsg = Twist()
-            [goalMsg.linear.x, goalMsg.linear.y, goalMsg.linear.z, self.error_linear_acc,self.last_error_linear] = self.Linear_PID(self.target_vec, np.array([0.0,0.0]), 2, 0, 0.01, self.error_linear_acc, self.last_error_linear, self.dt);
+            compare = self.target_vec != np.zeros((2), dtype=float)
+            if compare.all():
+                [goalMsg.linear.x, goalMsg.linear.y, goalMsg.linear.z, self.error_linear_acc,self.last_error_linear] = self.Linear_PID(self.target_vec, np.array([0.0,0.0]), 0.8, 0, 0.01, self.error_linear_acc, self.last_error_linear, self.dt);
+            else:
+                goalMsg.linear.x=0
+                goalMsg.linear.y=0
+                goalMsg.linear.z=0
             goalMsg.linear.x = linear_fX;
+            # print("lx: {}, ly:{}, lz:{}".format(goalMsg.linear.x, goalMsg.linear.y, goalMsg.linear.z))
             goalMsg.angular.x=0;
             goalMsg.angular.y=0;
             goalMsg.angular.z=0;
