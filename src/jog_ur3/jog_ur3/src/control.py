@@ -26,14 +26,14 @@ class UR3_control(object):
         self.pixl2mm = 0.283
         self.ft_vec = np.zeros((3), dtype = float)
         self.force_goal = np.zeros((3), dtype = float)
-        self.force_goal[2] = -5.0
+        self.force_goal[2] = -4.0
 
         self.cur_pos = np.zeros((3), dtype = float)
         self.Image_ctrl_pixl = np.zeros((2), dtype = float)
         self.Image_ctrl_pixl[0] = 159
         self.Image_ctrl_pixl[1] = 250
         self.dt = 0.1
-        self.track_msg_hist = np.ones((5), dtype = int)*2
+        self.track_msg_hist = np.ones((3), dtype = int)*2
         self.error_force_acc = np.zeros((3), dtype = float)
         self.last_error_force = np.zeros((3), dtype = float)
         self.last_error_linear = np.zeros((2), dtype = float)
@@ -43,8 +43,8 @@ class UR3_control(object):
         self.docked_flg = msg.data
 
     def track_CB(self, msg):
-        self.track_msg_hist[0:4]=self.track_msg_hist[1:5]
-        self.track_msg_hist[4] = msg.data
+        self.track_msg_hist[0:2]=self.track_msg_hist[1:3]
+        self.track_msg_hist[2] = msg.data
 
         start_flg = self.check_start(self.track_msg_hist);
 
@@ -201,12 +201,12 @@ class UR3_control(object):
 
     def controller(self):
         if self.track_flg:
-            [linear_fX, self.error_force_acc ,self.last_error_force] = self.Force_PID(self.force_goal, self.ft_vec, 0, 0, 0, self.error_force_acc, self.last_error_force, self.dt)#0.05, 0.005
+            [linear_fX, self.error_force_acc ,self.last_error_force] = self.Force_PID(self.force_goal, self.ft_vec, 0.05, 0, 0.005, self.error_force_acc, self.last_error_force, self.dt)#0.05, 0.005
 
             goalMsg = Twist()
             compare = self.target_vec != np.zeros((2), dtype=float)
             if compare.all():
-                [goalMsg.linear.x, goalMsg.linear.y, goalMsg.linear.z, self.error_linear_acc,self.last_error_linear] = self.Linear_PID(self.target_vec, np.array([0.0,0.0]), 0.8, 0, 0.01, self.error_linear_acc, self.last_error_linear, self.dt);
+                [goalMsg.linear.x, goalMsg.linear.y, goalMsg.linear.z, self.error_linear_acc,self.last_error_linear] = self.Linear_PID(self.target_vec, np.array([0.0,0.0]), 1, 0.01, 0, self.error_linear_acc, self.last_error_linear, self.dt);
             else:
                 goalMsg.linear.x=0
                 goalMsg.linear.y=0
@@ -216,8 +216,8 @@ class UR3_control(object):
             goalMsg.angular.x=0;
             goalMsg.angular.y=0;
             goalMsg.angular.z=0;
-
-            self.ee_pos_Pub.publish(goalMsg)
+            if 0.094<self.cur_pos[1]<0.126:
+                self.ee_pos_Pub.publish(goalMsg)
 
 
 Ur3Control = UR3_control()
