@@ -23,7 +23,7 @@
 
 clear all
 P.iter = 1;
-P.startDepth = 0;
+P.startDepth = 5;
 P.endDepth = 160;   % Acquisition depth in wavelengths
 P.record = 0;
 % Define system parameters.
@@ -46,13 +46,13 @@ Trans = computeUTAMux64(Trans); % Add HVMux field for use with UTA 260-Mux
 P.mm2wl = Trans.frequency/(Resource.Parameters.speedOfSound/1000);
 P.wl2mm = Resource.Parameters.speedOfSound/1000/Trans.frequency;
 
-P.theta = -pi/4;
+P.theta = -pi/8;
 P.rayDelta = 2*(-P.theta);
 P.aperture = 64*Trans.spacing; % P.aperture in wavelengths
 P.radius = (P.aperture/2)/tan(-P.theta); % dist. to virt. apex
 
 % Set up PData structure.
-PData(1).PDelta = [0.875, 0, 0.5]; %[Trans.spacing, 0, 0.5]
+PData(1).PDelta = [0.8, 0, 0.5]; %[Trans.spacing, 0, 0.5]
 PData(1).Size(1) = 10 + ceil((P.endDepth-P.startDepth)/PData(1).PDelta(3));
 PData(1).Size(2) = 10 + ceil(2*(P.endDepth + P.radius)*sin(-P.theta)/PData(1).PDelta(1));
 P.pxl2mm = (P.endDepth-P.startDepth)*P.wl2mm/ceil((P.endDepth-P.startDepth)/PData(1).PDelta(3)); %pixel size in [mm]
@@ -170,7 +170,7 @@ Process(1).Parameters = {'imgbufnum',1,...   % number of buffer to process.
                          'processMethod','none',...
                          'averageMethod','none',...
                          'compressMethod','power',...
-                         'compressFactor',40,...
+                         'compressFactor',100,...
                          'mappingMethod','full',...
                          'display',1,...      % display image after processing
                          'displayWindow',1};
@@ -290,11 +290,11 @@ myProcFunction(RData)
 persistent myHandle
 P = evalin('base','P');
 % Resource = evalin('base','Resource');
-if isempty(myHandle)||~ishandle(myHandle)
-    figure;
-    myHandle = axes('XLim', [0,size(RData,2)], 'YLim', [0, size(RData,1)],...
-    'Ydir','reverse','NextPlot', 'replacechildren');
-end
+% if isempty(myHandle)||~ishandle(myHandle)
+%     figure;
+%     myHandle = axes('XLim', [0,size(RData,2)], 'YLim', [0, size(RData,1)],...
+%     'Ydir','reverse','NextPlot', 'replacechildren');
+% end
 %Plot the RF data
 
 % set(myHandle,'XLim',[0,size(RData,2)],'YLim',[0,size(RData,1)])
@@ -336,9 +336,20 @@ end
 % % end
 % hold off
 gray_img = mat2gray(RData);
-imagesc(myHandle,gray_img);
-colormap(gray(256))
-title(myHandle, sprintf('Pxl2mm = %0.3f',P.pxl2mm))
+% gray_img = imadjust(gray_img);
+% gray_img = medfilt2(gray_img);
+
+gray_img = imresize(gray_img, [500 NaN]);
+
+% if isempty(myHandle)||~ishandle(myHandle)
+%     figure;
+%     myHandle = axes('XLim', [0,size(gray_img,2)], 'YLim', [0, size(gray_img,1)],...
+%     'Ydir','reverse','NextPlot', 'replacechildren');
+% end
+% imagesc(myHandle,gray_img);
+% colormap(gray(256))
+
+% title(myHandle, sprintf('Pxl2mm = %0.3f',P.pxl2mm))
 
 % keyboard % debug
 % ImgDisplay = get(Resource.DisplayWindow(1).imageHandle,'CData');
@@ -347,8 +358,10 @@ title(myHandle, sprintf('Pxl2mm = %0.3f',P.pxl2mm))
 % caxis([0 256]);
 % 
 if P.record
-    Image = getframe(myHandle);
-    imwrite(Image.cdata, [pwd '/Verasonics_training/Images/scene',num2str(P.iter),'.png']);
+    imwrite(gray_img, [pwd '/Verasonics_Haoran/Images/Scene/scene',num2str(P.iter),'.png']);
+    imwrite(gray_img, [pwd '/Verasonics_Haoran/Images/scene1.png']);
+%     Image = getframe(myHandle);
+%     imwrite(Image.cdata, [pwd '/Verasonics_Haoran/Images/scene',num2str(P.iter),'.png']);
     P.iter = P.iter+1;
     assignin('base','P', P);
 end
