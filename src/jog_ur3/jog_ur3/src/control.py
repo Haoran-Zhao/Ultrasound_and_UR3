@@ -216,8 +216,8 @@ class UR3_control(object):
             goalMsg.angular.x=0;
             goalMsg.angular.y=0;
             goalMsg.angular.z=0;
-            if 0.094<self.cur_pos[1]<0.126:
-                self.ee_pos_Pub.publish(goalMsg)
+            # if 0.094<self.cur_pos[1]<0.126:
+            #     self.ee_pos_Pub.publish(goalMsg)
 
 
 Ur3Control = UR3_control()

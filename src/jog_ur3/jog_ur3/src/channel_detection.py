@@ -14,7 +14,7 @@ class ultrasound_detection:
         self.bridge = cv_bridge.CvBridge()
         self.image_sub = rospy.Subscriber('FrameRaw', Image, self.imageCB)
         self.xy_pub = rospy.Publisher('cur_xy', Float64MultiArray, queue_size=1)
-        self.mask = cv2.imread('/home/haoran/UR_ws/src/jog_ur3/jog_ur3/mask/doppler_bg_mask2.png')
+        self.mask = cv2.imread('/home/haoran/UR_ws/src/jog_ur3/jog_ur3/mask/flash_bg_mask.png')
         self.mask = cv2.cvtColor(self.mask, cv2.COLOR_BGR2GRAY)
         _, self.mask = cv2.threshold(self.mask, 40, 255, cv2.THRESH_BINARY)
         self.cur_pos = Float64MultiArray()
