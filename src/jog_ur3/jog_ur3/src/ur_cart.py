@@ -232,8 +232,8 @@ class UR3CartROS(object):
         # self.ft_data[0] = ft_msg.wrench.force.x
         # self.ft_data[1] = ft_msg.wrench.force.y
         # self.ft_data[2] = -ft_msg.wrench.force.z
-        self.ft_data[0] = ft_msg.linear.x
-        self.ft_data[1] = ft_msg.linear.y
+        self.ft_data[0] = math.floor(ft_msg.linear.x) if ft_msg.linear.x >= 0 else math.ceil(ft_msg.linear.x)
+        self.ft_data[1] = math.floor(ft_msg.linear.y) if ft_msg.linear.y >= 0 else math.ceil(ft_msg.linear.y)
         self.ft_data[2] = -ft_msg.linear.z
         ft_norm = np.around(np.abs(self.ft_data[2]), decimals=1)
         # print('contacted force: {}'.format(np.linalg.norm(self.ft_data)))
@@ -299,7 +299,7 @@ class UR3CartROS(object):
             self.init_pub.publish(self.init_pos)
             self.docked.data = False
             self.docked_pub.publish(self.docked)
-            eef_home_joint = [0, -0.61*math.pi, -0.51*math.pi, 0.1366*math.pi, math.pi/2, math.pi*1.5]
+            eef_home_joint = [0, -0.60*math.pi, -0.511*math.pi, 0.1074*math.pi, 0.5038*math.pi, math.pi*1.5]
             # eef_home_joint = [-math.pi, -1.211, 1.92553, -0.71161395, math.pi/2, math.pi/2]
             # eef_home_joint = [0.007588, -1.211, 1.92553, -0.71161395, math.pi/2, math.pi/2]
             # eef_home_joint = [0, -1.1123, 1.9444, -math.pi/4, math.pi/2, math.pi/2]
