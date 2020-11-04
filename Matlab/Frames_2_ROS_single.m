@@ -1,11 +1,11 @@
 clear
 close all
 
-setenv('ROS_MASTER_URI','http://192.168.1.3:11311')
-setenv('ROS_IP','192.168.1.2')
+setenv('ROS_MASTER_URI','http://192.168.1.6:11311')
+setenv('ROS_IP','192.168.1.4')
 
 rosshutdown;
-IP = '192.168.1.3';
+IP = '192.168.1.6';
 rosinit(IP,11311);
 
 [framePub, frameMsg] = rospublisher('/FrameRaw','sensor_msgs/Image');
