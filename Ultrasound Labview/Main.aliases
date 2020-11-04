@@ -1,6 +1,6 @@
 [My Computer]
-My Computer = "172.27.19.128"
+My Computer = "192.168.1.2"
 
 [NI-IC-3173-01BA58CC]
-NI-IC-3173-01BA58CC = "169.254.47.89"
+NI-IC-3173-01BA58CC = "192.168.1.3"
 
