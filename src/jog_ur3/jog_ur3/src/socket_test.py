@@ -5,7 +5,12 @@ import math
 import socket
 import geometry_msgs.msg
 from geometry_msgs.msg import Point, Twist
+import numpy as np
 
+
+def lpf(alpha, ft_data, last):
+    last = last + alpha * (ft_data - last)
+    return last
 
 if __name__=='__main__':
     rospy.init_node('tf_listener')
@@ -13,6 +18,7 @@ if __name__=='__main__':
     HOST = '192.168.1.5'
     PORT = 63351
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    last = np.array([0,0,0])
     try:
         print("Connecting to " + HOST)
         s.connect((HOST,PORT))
@@ -27,12 +33,13 @@ if __name__=='__main__':
             data = data.replace("(", "")
             data = data.replace(")", "\n")
             data = data.split(" , ")
-            ft_data = [float(data[0]), float(data[1]), float(data[2])]
+            ft_data = np.array([float(data[0]), float(data[1]), float(data[2])])
             # print(repr(ft_data))
             # rospy.loginfo("ft_data: {}".format(ft_data))
-            twist.linear.x = ft_data[0]
-            twist.linear.y = ft_data[1]
-            twist.linear.z = ft_data[2]
+            last = lpf(0.05, ft_data, last)
+            twist.linear.x = last[0]
+            twist.linear.y = last[1]
+            twist.linear.z = last[2]
             ft_pub.publish(twist)
         except KeyboardInterrupt:
             s.close

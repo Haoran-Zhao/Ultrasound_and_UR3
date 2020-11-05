@@ -17,7 +17,12 @@ class ultrasound_detection:
         self.mask = cv2.imread('/home/haoran/UR_ws/src/jog_ur3/jog_ur3/mask/flash_bg_mask.png')
         self.mask = cv2.cvtColor(self.mask, cv2.COLOR_BGR2GRAY)
         self.cur_pos = Float64MultiArray()
+        self.last_pos = np.array([0, 0])
 
+
+    def lpf(self, last, cur, alpha):
+        last = last + alpha*(cur-last)
+        return last
 
     def contrast_brightness(self, cur_frame_gray, alpha, beta):
         new_image = cur_frame_gray.copy()
@@ -134,11 +139,18 @@ class ultrasound_detection:
                 text = '({}, {})'.format(x + w / 2, y + h / 2)
                 cv2.putText(temp, text, (x - 50, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
                 # cv2.drawContours(temp, [box], 0, (0, 255, 0), 2)
-                self.cur_pos.data = [x + w/2, y + h/2]
+                cur_pos = np.array([x + w/2, y + h/2])
             else:
-                self.cur_pos.data = [0, 0]
+                cur_pos = np.array([0, 0])
         else:
-            self.cur_pos.data = [0, 0]
+            cur_pos = np.array([0, 0])
+
+        if np.array_equal(self.last_pos, [0,0]):
+            self.last_pos = cur_pos
+        else:
+            self.last_pos = lpf(self.last_pos, cur_pos, 0.3)
+
+        self.cur_pos.data = [self.last_pos[0], self.last_pos[1]]
         self.xy_pub.publish(self.cur_pos)
         cv2.imshow('img', temp)
         key = cv2.waitKey(1)

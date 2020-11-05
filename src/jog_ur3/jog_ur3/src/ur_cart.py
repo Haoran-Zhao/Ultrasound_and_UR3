@@ -299,10 +299,10 @@ class UR3CartROS(object):
             self.init_pub.publish(self.init_pos)
             self.docked.data = False
             self.docked_pub.publish(self.docked)
-            eef_home_joint = [0, -0.60*math.pi, -0.511*math.pi, 0.1074*math.pi, 0.5038*math.pi, math.pi*1.5]
+            # eef_home_joint = [0, -0.60*math.pi, -0.511*math.pi, 0.1074*math.pi, 0.5038*math.pi, math.pi*1.5]
             # eef_home_joint = [-math.pi, -1.211, 1.92553, -0.71161395, math.pi/2, math.pi/2]
             # eef_home_joint = [0.007588, -1.211, 1.92553, -0.71161395, math.pi/2, math.pi/2]
-            # eef_home_joint = [0, -1.1123, 1.9444, -math.pi/4, math.pi/2, math.pi/2]
+            eef_home_joint = [0, -0.60*math.pi, -0.477*math.pi, 0.0812*math.pi, 0.5*math.pi, 1.5*math.pi]
             self.pub_joint_pos(eef_home_joint)
             rospy.loginfo("ee_f_cart_pos %s", self.get_eef_pose())
             # rospy.sleep(1)
