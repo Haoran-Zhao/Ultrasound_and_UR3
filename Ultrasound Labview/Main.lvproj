@@ -1,45 +1,45 @@
 ﻿<?xml version='1.0' encoding='UTF-8'?>
 <Project Type="Project" LVVersion="20008000">
-	<Property Name="varPersistentID:{01FEAE9C-7963-4C79-BD15-5EA1B4178F3F}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI4</Property>
-	<Property Name="varPersistentID:{0CD9B07E-CFD3-484A-BFCF-4DEB08D585A5}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC6</Property>
-	<Property Name="varPersistentID:{0D21D739-7FC9-42C5-A65D-AB09C142A024}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC4</Property>
-	<Property Name="varPersistentID:{0D9E79FA-AC54-49B3-BF04-E2F6FC3E684A}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI0</Property>
-	<Property Name="varPersistentID:{1773A955-D49A-4C4E-AA53-5EAA8F2FF8C7}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI3</Property>
-	<Property Name="varPersistentID:{1E1659B0-38F2-4D12-A802-F9A395BFCBE3}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC2</Property>
-	<Property Name="varPersistentID:{1FAFDCA5-DDC3-4EC5-A8B1-87AA77A1854A}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC8</Property>
-	<Property Name="varPersistentID:{36EFB9B6-AF4C-4BCF-AFA0-AEB793A10496}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI10</Property>
-	<Property Name="varPersistentID:{3B3535FB-8FCF-4FE3-B7F7-F78B8575300C}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI8</Property>
-	<Property Name="varPersistentID:{3D0B0146-A395-4D7C-8A07-421BB64C4D06}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod2/AO3</Property>
-	<Property Name="varPersistentID:{3E071F37-0BA1-4A18-A596-98A5CB65CDD4}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC3</Property>
-	<Property Name="varPersistentID:{4944AB84-6F6C-497D-BE31-35599C8983F4}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI9</Property>
-	<Property Name="varPersistentID:{552BBE3E-28B2-4AA0-8C9D-FF92C1B7DAB8}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC7</Property>
-	<Property Name="varPersistentID:{56EE1B43-D5A2-49DA-ADB6-DF5C1A9BDDDC}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod1/AO3</Property>
-	<Property Name="varPersistentID:{58B1C494-D4B2-4F75-A94F-AD007AF1A184}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC10</Property>
-	<Property Name="varPersistentID:{65DEED63-9B5A-41B8-AF0D-65B8B93CCD43}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC14</Property>
-	<Property Name="varPersistentID:{6ABD8311-A23F-410A-AB58-27BA60AB401A}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC12</Property>
-	<Property Name="varPersistentID:{86EE6B27-3E38-41F1-89F1-D9931AF07ECF}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod1/AO0</Property>
-	<Property Name="varPersistentID:{87E81447-820A-45ED-9C85-A3F1FB7F5373}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC9</Property>
-	<Property Name="varPersistentID:{8861D213-429B-466C-AF35-CC2BAE5C62BF}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI11</Property>
-	<Property Name="varPersistentID:{8D2009C2-09D0-4C78-B61C-A3D6EA7C634E}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI15</Property>
-	<Property Name="varPersistentID:{8D677BF4-F884-48CB-BF88-FEC84CDC1658}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI14</Property>
-	<Property Name="varPersistentID:{8E226363-6AEA-4A25-8259-A820ED9D4B84}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI1</Property>
-	<Property Name="varPersistentID:{9014F64A-46F7-4295-ACA2-F5B1B06BDACB}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod2/AO0</Property>
-	<Property Name="varPersistentID:{9041F8D4-BE51-45AA-AD5C-9E78F22704C4}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI13</Property>
-	<Property Name="varPersistentID:{99505450-4196-42B2-B779-D3BD2AFBD604}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC13</Property>
-	<Property Name="varPersistentID:{A4D23D02-A5B8-4F54-AD77-6D0140151711}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC11</Property>
-	<Property Name="varPersistentID:{AE9020DE-691F-4D0E-B0ED-AE441D2BDC1E}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod1/AO2</Property>
-	<Property Name="varPersistentID:{B153F49C-5E4B-47F5-92E4-5E28B89C2815}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI5</Property>
-	<Property Name="varPersistentID:{B291C172-34D8-41E8-99B2-FF1C08CCAEF4}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC1</Property>
-	<Property Name="varPersistentID:{BEF3166B-E14F-4A41-8481-8C70D1D938F7}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI12</Property>
-	<Property Name="varPersistentID:{C5A996BA-EBAE-43CA-A777-C513196ACD3B}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod2/AO1</Property>
-	<Property Name="varPersistentID:{C60DAD98-5145-4FFB-98DA-5D1E83F0E0FF}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod1/AO1</Property>
-	<Property Name="varPersistentID:{CA9CC0E2-C716-4990-8C80-DD8FAA4D0B9D}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI6</Property>
-	<Property Name="varPersistentID:{CCDC8A1D-629D-4C0E-98B0-43057CFCBFAF}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC0</Property>
-	<Property Name="varPersistentID:{D00AF84C-4D9B-45B4-83DA-7AA61DC4BE91}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI7</Property>
-	<Property Name="varPersistentID:{ED99863C-B1A2-43F1-A09E-388FDF42313D}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod2/AO2</Property>
-	<Property Name="varPersistentID:{F2FBB712-CDB8-42FE-8735-CE031B24D556}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC15</Property>
-	<Property Name="varPersistentID:{F336A803-B0A8-4D85-8CF2-BF4D8D67C96B}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC5</Property>
-	<Property Name="varPersistentID:{F6FB7828-CFB3-4AA7-AC4B-3A6B0064D59B}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI2</Property>
+	<Property Name="varPersistentID:{193749E9-2938-436A-BAC4-6348F1B6FCE5}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI10</Property>
+	<Property Name="varPersistentID:{1944731C-74A7-4C13-8334-6FFBFC306DF8}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI9</Property>
+	<Property Name="varPersistentID:{1DE2702D-6816-480D-BCF9-AE8EBF41D0B7}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod1/AO0</Property>
+	<Property Name="varPersistentID:{200025C9-4D07-4C5A-B201-335E3EF13603}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC13</Property>
+	<Property Name="varPersistentID:{2023B937-54E9-4849-AB6D-96ED2ADEA3D2}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC15</Property>
+	<Property Name="varPersistentID:{21EC3E86-BE51-4035-9BC7-C6A98A120689}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod1/AO1</Property>
+	<Property Name="varPersistentID:{253AC4F7-8616-4A93-AC36-4D39A96287D3}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod2/AO3</Property>
+	<Property Name="varPersistentID:{2ADFE349-3DDF-4102-A487-FE7CFA3BB3A4}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC0</Property>
+	<Property Name="varPersistentID:{4CA8DFF2-B1DD-4F29-880A-186F3A4C471E}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC14</Property>
+	<Property Name="varPersistentID:{4D774FB1-57DF-474E-AC4A-956830DDCBCA}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC4</Property>
+	<Property Name="varPersistentID:{52BA196E-2186-4638-B731-76397046CF7A}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI14</Property>
+	<Property Name="varPersistentID:{541E22FD-428F-469F-8674-6B517700BBD0}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod1/AO2</Property>
+	<Property Name="varPersistentID:{55F5D94D-8A6D-4CF9-B928-EBE930D5C8AA}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI1</Property>
+	<Property Name="varPersistentID:{611EBEA9-3134-4443-8F9F-D29E37EC10C4}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI5</Property>
+	<Property Name="varPersistentID:{66A049B9-ACC5-44BB-972F-8A8142C401E5}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI6</Property>
+	<Property Name="varPersistentID:{70A900A7-6330-4879-8F1B-B986A3CC9C03}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI13</Property>
+	<Property Name="varPersistentID:{716ADA01-F011-4779-A513-2C9CC5F76DE4}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC2</Property>
+	<Property Name="varPersistentID:{83102504-7A7B-43AA-B526-9567BE1A81EE}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC8</Property>
+	<Property Name="varPersistentID:{8539752B-D53F-41DE-92D3-C4573C36FE2F}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC1</Property>
+	<Property Name="varPersistentID:{896513C0-58C2-4C7C-8C51-0EFF2A0F4B8D}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC9</Property>
+	<Property Name="varPersistentID:{8E39D415-FC62-4AB6-B509-54D9C7C4BD03}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC6</Property>
+	<Property Name="varPersistentID:{8FD50FAA-DED5-4D8B-967F-938DF4E4E94F}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC12</Property>
+	<Property Name="varPersistentID:{911D75E7-3F5F-4B4A-9B59-BB2A9E2277CE}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI12</Property>
+	<Property Name="varPersistentID:{92998776-AD12-47A8-B068-41788CFF26E9}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC11</Property>
+	<Property Name="varPersistentID:{988465A9-EE39-4883-A185-FCB4E1400A52}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC10</Property>
+	<Property Name="varPersistentID:{98CE82A7-D7F0-4844-ADF6-D2607E5FC229}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI3</Property>
+	<Property Name="varPersistentID:{A612A0B9-0B69-42C2-9D7E-019530BF68BB}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI11</Property>
+	<Property Name="varPersistentID:{B6192125-02DB-40DB-89CE-EB554FF92DC6}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod2/AO0</Property>
+	<Property Name="varPersistentID:{B7B70754-9950-4135-B581-243E59FDD9D0}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI2</Property>
+	<Property Name="varPersistentID:{BA2CB39E-A7C7-45EB-A3A6-3FCACD720CF1}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC3</Property>
+	<Property Name="varPersistentID:{C0892FB9-D2EB-435F-9167-A94C120750C8}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC7</Property>
+	<Property Name="varPersistentID:{C173450E-A49D-4559-B91D-A9012492C432}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod3/TC5</Property>
+	<Property Name="varPersistentID:{D2573A23-2325-42E3-BAE0-A0B0D5A4F9D1}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI0</Property>
+	<Property Name="varPersistentID:{D287E296-67B0-43C3-9455-1CB25BE41FDF}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI7</Property>
+	<Property Name="varPersistentID:{D3C382C4-4110-4E1D-B5E4-F49A0E57EC2E}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod2/AO1</Property>
+	<Property Name="varPersistentID:{DDC6B019-9B40-4436-9637-6100C89428EB}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI4</Property>
+	<Property Name="varPersistentID:{EDE0F6A1-88A9-4341-8947-D9CB03510C80}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod1/AO3</Property>
+	<Property Name="varPersistentID:{F0EC4F86-9793-4509-B4B1-D47EFFA048A6}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI8</Property>
+	<Property Name="varPersistentID:{F2CAC75D-573F-4464-8E1A-1766A2CABB59}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod2/AO2</Property>
+	<Property Name="varPersistentID:{FCA2AE4D-A311-4FB5-8240-C952F5478AD2}" Type="Ref">/NI-IC-3173-01BA58CC/EtherCAT Master/Device/Mod4/AI15</Property>
 	<Item Name="My Computer" Type="My Computer">
 		<Property Name="server.app.propertiesEnabled" Type="Bool">true</Property>
 		<Property Name="server.control.propertiesEnabled" Type="Bool">true</Property>
@@ -237,7 +237,7 @@ AddOutputFilter chunkFilter
 					<Property Name="ECAT.Module.ProductCode" Type="UInt">9263</Property>
 					<Property Name="ECAT.Module.RevisionNo" Type="UInt">1</Property>
 					<Property Name="ECAT.Module.SerialNo" Type="UInt">29761299</Property>
-					<Property Name="ECAT.Module.Type" Type="UInt">0</Property>
+					<Property Name="ECAT.Module.Type" Type="UInt">335546944</Property>
 					<Property Name="ECAT.Module.TypeName" Type="Str">NI 9263</Property>
 					<Property Name="ECAT.Module.VendorID" Type="UInt">505</Property>
 					<Property Name="ECAT.Name" Type="Str">Mod1</Property>
@@ -1024,6 +1024,7 @@ AddOutputFilter chunkFilter
 			<Item Name="nivision.dll" Type="Document" URL="nivision.dll">
 				<Property Name="NI.PreserveRelativePath" Type="Bool">true</Property>
 			</Item>
+			<Item Name="MCStatic_53690370032_dafd744a7c59bfec2a7e5e72262e0dbd.vi" Type="VI" URL="../../../../Documents/LabVIEW Data/MathScriptVIs/MCStatic_53690370032_dafd744a7c59bfec2a7e5e72262e0dbd.vi"/>
 		</Item>
 		<Item Name="Build Specifications" Type="Build"/>
 	</Item>
