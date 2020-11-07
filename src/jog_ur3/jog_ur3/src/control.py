@@ -160,7 +160,7 @@ class UR3_control(object):
         output = Kp * e + Ki * error_out - Kd/dt * (e - last_in); #PID controller
         linear_X = 0; # scaler(output[0], 0.1);
         # rospy.loginfo('linear_Y {}'.format(output[0]))
-        linear_Y = -self.scaler(output[0], 0.1);
+        linear_Y = self.scaler(output[0], 0.1);
         linear_Z = 0; # self.scaler(output[1], 0.1);
 
         return linear_X, linear_Y, linear_Z, error_out,last_out
@@ -219,7 +219,7 @@ class UR3_control(object):
             goalMsg = Twist()
             compare = self.target_vec != np.zeros((2), dtype=float)
             if compare.all():
-                [goalMsg.linear.x, goalMsg.linear.y, goalMsg.linear.z, self.error_linear_acc,self.last_error_linear] = self.Linear_PID(self.target_vec, np.array([0.0,0.0]), 0.3, 0.0001, 0, self.error_linear_acc, self.last_error_linear, self.dt);
+                [goalMsg.linear.x, goalMsg.linear.y, goalMsg.linear.z, self.error_linear_acc,self.last_error_linear] = self.Linear_PID(self.target_vec, np.array([0.0,0.0]), 1, 0.0001, 0, self.error_linear_acc, self.last_error_linear, self.dt);
             else:
                 goalMsg.linear.x=0
                 goalMsg.linear.y=0
@@ -234,6 +234,7 @@ class UR3_control(object):
                 rospy.loginfo("1")
                 if (self.cur_pos[1] + 0.002 > 0.128 and goalMsg.linear.y > 0)or (self.cur_pos[1]-0.002 < 0.1 and goalMsg.linear.y < 0):
                     goalMsg.linear.y = 0
+                    rospy.loginfo("1.5")
 
             else:
                 goalMsg.linear.x=0
@@ -243,14 +244,6 @@ class UR3_control(object):
                 goalMsg.angular.y=0;
                 goalMsg.angular.z=0;
                 rospy.loginfo("{}".format(self.cur_pos[1]))
-
-                if np.round(self.cur_pos[1],3)>=0.129:
-                    goalMsg.linear.y=-0.05
-                    rospy.loginfo("2")
-
-                elif np.round(self.cur_pos[1],3)<=0.09:
-                    goalMsg.linear.y=0.05
-                    rospy.loginfo("3")
 
             self.ee_pos_Pub.publish(goalMsg)
 
