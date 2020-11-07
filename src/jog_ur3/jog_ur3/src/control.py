@@ -45,7 +45,7 @@ class UR3_control(object):
     def track_CB(self, msg):
         self.track_msg_hist[0:2]=self.track_msg_hist[1:3]
         self.track_msg_hist[2] = msg.data
-
+        # rospy.loginfo('{}'.format(self.track_msg_hist))
         start_flg = self.check_start(self.track_msg_hist);
 
         self.track_flg = start_flg if start_flg!=-1 else self.track_flg
@@ -54,12 +54,13 @@ class UR3_control(object):
         self.init_flg = msg.data
 
     def Image_xy_CB(self, msg):
-        if msg.data != (0, 0):
+        msg.data = np.round(msg.data)
+        if msg.data[0]!= 0.0 and msg.data[1] != 0.0:
             self.target_vec[0] = (msg.data[0] - self.Image_ctrl_pixl[0]) * self.pixl2mm
             self.target_vec[1] = (msg.data[1]- self.Image_ctrl_pixl[1]) * self.pixl2mm
         else:
             self.target_vec = np.zeros((2), dtype=float)
-
+        # rospy.loginfo('img {}'.format(self.target_vec))
 
     def ft_CB(self, msg):
         self.ft_vec[0] = np.round(msg.linear.x,1)
@@ -74,18 +75,18 @@ class UR3_control(object):
         self.cur_pos[2] = np.round(msg.z,4)
 
     def check_start(self, hist):
-        n = len(hist)
-        count_start = 0
-        count_halt = 0
-        for i in range(n):
-            if hist[i] == -2:
-                count_start +=1
-            elif hist[i] == 2:
-                count_halt +=1
-        if count_halt==n:
+        # n = len(hist)
+        # count_start = 0
+        # count_halt = 0
+        # for i in range(n):
+        #     if hist[i] == -2:
+        #         count_start +=1
+        #     elif hist[i] == 2:
+        #         count_halt +=1
+        if hist[-1] == 2:
             rospy.loginfo('stop tracking...')
             return 0;
-        elif count_start ==n:
+        elif hist[-1] ==-2:
             rospy.loginfo('start tracking...')
             return 1;
         else:
@@ -158,6 +159,7 @@ class UR3_control(object):
         last_out = e;
         output = Kp * e + Ki * error_out - Kd/dt * (e - last_in); #PID controller
         linear_X = 0; # scaler(output[0], 0.1);
+        # rospy.loginfo('linear_Y {}'.format(output[0]))
         linear_Y = -self.scaler(output[0], 0.1);
         linear_Z = 0; # self.scaler(output[1], 0.1);
 
@@ -178,10 +180,10 @@ class UR3_control(object):
     def Force_PID(self, goal_force, cur_force, Kp, Ki, Kd, error_in, last_in, dt):
     #   stf_factor = [35e4, 35e4, 30e4]; %N/m
         e = goal_force[2] - cur_force[2];
-        error_out = error_in + e;
+        error_out = error_in + e*dt;
         last_out = e;
         output = Kp * e  + Ki* error_out - Kd/dt * (e - last_in); # PID controller
-        linear_fX = self.scaler(output[0],1);
+        linear_fX = self.scaler_f(output[0],1);
         return linear_fX, error_out,last_out
 
     def scaler(self, input, weight):
@@ -199,25 +201,58 @@ class UR3_control(object):
             output = input
         return output
 
+    def scaler_f(self, input, weight):
+        # scale the output in range of [-1, 1]
+        input = np. round(input,3) * weight;
+        if input >= 1:
+            output =1
+        elif input <=-1:
+            output = -1
+        else:
+            output = input
+        return output
+
     def controller(self):
         if self.track_flg:
-            [linear_fX, self.error_force_acc ,self.last_error_force] = self.Force_PID(self.force_goal, self.ft_vec, 0.05, 0, 0.005, self.error_force_acc, self.last_error_force, self.dt)#0.05, 0.005
+            [linear_fX, self.error_force_acc ,self.last_error_force] = self.Force_PID(self.force_goal, self.ft_vec, 0.01, 0.0001, 0, self.error_force_acc, self.last_error_force, self.dt)#0.05, 0.005
 
             goalMsg = Twist()
             compare = self.target_vec != np.zeros((2), dtype=float)
             if compare.all():
-                [goalMsg.linear.x, goalMsg.linear.y, goalMsg.linear.z, self.error_linear_acc,self.last_error_linear] = self.Linear_PID(self.target_vec, np.array([0.0,0.0]), 1, 0.01, 0, self.error_linear_acc, self.last_error_linear, self.dt);
+                [goalMsg.linear.x, goalMsg.linear.y, goalMsg.linear.z, self.error_linear_acc,self.last_error_linear] = self.Linear_PID(self.target_vec, np.array([0.0,0.0]), 0.3, 0.0001, 0, self.error_linear_acc, self.last_error_linear, self.dt);
             else:
                 goalMsg.linear.x=0
                 goalMsg.linear.y=0
                 goalMsg.linear.z=0
-            goalMsg.linear.x = linear_fX;
-            # print("lx: {}, ly:{}, lz:{}".format(goalMsg.linear.x, goalMsg.linear.y, goalMsg.linear.z))
+            goalMsg.linear.x = 0 #linear_fX;
             goalMsg.angular.x=0;
             goalMsg.angular.y=0;
             goalMsg.angular.z=0;
-            # if 0.094<self.cur_pos[1]<0.126:
-            #     self.ee_pos_Pub.publish(goalMsg)
+
+            if 0.1<np.round(self.cur_pos[1],3)<0.128:
+                rospy.loginfo("lx: {}, ly:{}, lz:{}".format(goalMsg.linear.x, goalMsg.linear.y, goalMsg.linear.z))
+                rospy.loginfo("1")
+                if (self.cur_pos[1] + 0.002 > 0.128 and goalMsg.linear.y > 0)or (self.cur_pos[1]-0.002 < 0.1 and goalMsg.linear.y < 0):
+                    goalMsg.linear.y = 0
+
+            else:
+                goalMsg.linear.x=0
+                goalMsg.linear.y=0
+                goalMsg.linear.z=0
+                goalMsg.angular.x=0;
+                goalMsg.angular.y=0;
+                goalMsg.angular.z=0;
+                rospy.loginfo("{}".format(self.cur_pos[1]))
+
+                if np.round(self.cur_pos[1],3)>=0.129:
+                    goalMsg.linear.y=-0.05
+                    rospy.loginfo("2")
+
+                elif np.round(self.cur_pos[1],3)<=0.09:
+                    goalMsg.linear.y=0.05
+                    rospy.loginfo("3")
+
+            self.ee_pos_Pub.publish(goalMsg)
 
 
 Ur3Control = UR3_control()

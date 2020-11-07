@@ -145,10 +145,10 @@ class ultrasound_detection:
         else:
             cur_pos = np.array([0, 0])
 
-        if np.array_equal(self.last_pos, [0,0]):
+        if np.array_equal(self.last_pos, [0,0]) or np.array_equal(cur_pos, [0,0]):
             self.last_pos = cur_pos
         else:
-            self.last_pos = lpf(self.last_pos, cur_pos, 0.3)
+            self.last_pos = self.lpf(self.last_pos, cur_pos, 0.3)
 
         self.cur_pos.data = [self.last_pos[0], self.last_pos[1]]
         self.xy_pub.publish(self.cur_pos)
