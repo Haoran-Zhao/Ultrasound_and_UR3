@@ -14,7 +14,7 @@ class ultrasound_detection:
         self.bridge = cv_bridge.CvBridge()
         self.image_sub = rospy.Subscriber('FrameRaw', Image, self.imageCB)
         self.xy_pub = rospy.Publisher('cur_xy', Float64MultiArray, queue_size=1)
-        self.mask = cv2.imread('/home/haoran/UR_ws/src/jog_ur3/jog_ur3/mask/flash_bg_mask.png')
+        self.mask = cv2.imread('/home/haoran/UR_ws/src/jog_ur3/jog_ur3/mask/flash_bg_mask3.png')
         self.mask = cv2.cvtColor(self.mask, cv2.COLOR_BGR2GRAY)
         self.cur_pos = Float64MultiArray()
         self.last_pos = np.array([0, 0])
@@ -99,6 +99,7 @@ class ultrasound_detection:
     def preprocess(self, img, alpha=2, beta=-50):
         img = self.contrast_brightness(img, alpha, beta)
         _, img = cv2.threshold(img, 30, 255, cv2.THRESH_BINARY)
+        cv2.imshow('msk', img)
         contours, _ = cv2.findContours(img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
         for c in contours:
