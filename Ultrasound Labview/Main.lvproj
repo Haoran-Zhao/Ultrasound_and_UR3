@@ -158,8 +158,8 @@ AddOutputFilter chunkFilter
 		<Item Name="Global 2.vi" Type="VI" URL="../Global 2.vi"/>
 		<Item Name="InverseMagnetics.vi" Type="VI" URL="../InverseMagnetics.vi"/>
 		<Item Name="MainScript.vi" Type="VI" URL="../MainScript.vi"/>
-		<Item Name="MainUltrasound.vi" Type="VI" URL="/D/WorkingLabviewCode (Do not modify)/CodeWithNoTrajCont/MainUltrasound.vi"/>
 		<Item Name="MainSimple.vi" Type="VI" URL="../MainSimple.vi"/>
+		<Item Name="Main_ultra.vi" Type="VI" URL="../Main_ultra.vi"/>
 		<Item Name="PID.vi" Type="VI" URL="../PID.vi"/>
 		<Item Name="PowerSuppliesControlVoltageMode.vi" Type="VI" URL="../PowerSuppliesControlVoltageMode.vi"/>
 		<Item Name="PowerSupplyControl.vi" Type="VI" URL="../PowerSupplyControl.vi"/>
@@ -169,6 +169,7 @@ AddOutputFilter chunkFilter
 		<Item Name="VoltageController.vi" Type="VI" URL="../VoltageController.vi"/>
 		<Item Name="MathScriptTest.vi" Type="VI" URL="../MathScriptTest.vi"/>
 		<Item Name="TestTempSensor.vi" Type="VI" URL="../TestTempSensor.vi"/>
+		<Item Name="TrajectoryControllerAhead.vi" Type="VI" URL="../TrajectoryControllerAhead.vi"/>
 		<Item Name="EtherCAT Master" Type="ECATMaster">
 			<Property Name="ECAT.Adapter.Index" Type="UInt">0</Property>
 			<Property Name="ECAT.Master.Comments" Type="Str"></Property>
