@@ -8,6 +8,7 @@
 
   <node name="initial_node_ur_cart" pkg="jog_ur3" type="ur_cart.py" output="screen" />
   <node name="tf_test" pkg="jog_ur3" type="tf_test.py" output="screen" />
+  <node name="labview_server" pkg="jog_ur3" type="labviewserver.py" output="screen" />
   <!-- <node name="ultrasound_detection" pkg="jog_ur3" type="channel_detection.py" output="screen" /> -->
   <node name="ultrasound_detection" pkg="jog_ur3" type="flash_channel_detection.py" output="screen" />
 
